@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Store Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        .sidebar { height: 100vh; background: #f8f9fa; border-right: 1px solid #dee2e6; }
+        .chart-container { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        .stat-card { transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 sidebar">
+                <div class="p-3">
+                    <h3 class="text-primary">Phantom Admin</h3>
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link active dashboard-link" href="#dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link apps-link" href="#apps"><i class="bi bi-collection me-2"></i> Apps</a></li>
+                        <li class="nav-item"><a class="nav-link users-link" href="#users"><i class="bi bi-people me-2"></i> Users</a></li>
+                        <li class="nav-item"><a class="nav-link settings-link" href="#settings"><i class="bi bi-gear me-2"></i> Settings</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto p-4">
+                <!-- Dashboard Section -->
+                <section id="dashboard">
+                    <h2 class="mb-4">Dashboard</h2>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3"><div class="card stat-card bg-primary text-white"><div class="card-body"><h5><i class="bi bi-download me-2"></i> Downloads</h5><h2 id="total-downloads">0</h2></div></div></div>
+                        <div class="col-md-3"><div class="card stat-card bg-success text-white"><div class="card-body"><h5><i class="bi bi-eye me-2"></i> Visits</h5><h2 id="total-visits">0</h2></div></div></div>
+                        <div class="col-md-3"><div class="card stat-card bg-warning text-dark"><div class="card-body"><h5><i class="bi bi-puzzle me-2"></i> Pending</h5><h2 id="pending-apps">0</h2></div></div></div>
+                        <div class="col-md-3"><div class="card stat-card bg-info text-white"><div class="card-body"><h5><i class="bi bi-people me-2"></i> Users</h5><h2 id="total-users">0</h2></div></div></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"><div class="chart-container"><h5>Traffic</h5><canvas id="trafficChart"></canvas></div></div>
+                        <div class="col-md-6"><div class="chart-container"><h5>Developer Activity</h5><canvas id="uploadsChart"></canvas></div></div>
+                    </div>
+                </section>
+
+                <!-- Apps Section -->
+                <section id="apps" class="d-none">
+                    <div class="d-flex justify-content-between mb-4">
+                        <h2>App Management</h2>
+                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="autoApprove"><label class="form-check-label" for="autoApprove">Auto-Approve</label></div>
+                    </div>
+                    <div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>App Name</th><th>Developer</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="appsTable"></tbody></table></div>
+                </section>
+
+                <!-- Users Section -->
+                <section id="users" class="d-none">
+                    <h2 class="mb-4">User Management</h2>
+                    <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#clients">Clients</a></li><li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#developers">Developers</a></li></ul>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="clients"><div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>Name</th><th>Email</th><th>Downloads</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div>
+                        <div class="tab-pane fade" id="developers"><div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>Company</th><th>Apps</th><th>Approved</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="developersTable"></tbody></table></div></div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings" class="d-none">
+                    <h2 class="mb-4">Settings</h2>
+                    <form id="websiteSettings"><div class="row g-4">
+                        <div class="col-md-6"><div class="card h-100"><div class="card-body"><h5>General</h5>
+                            <div class="mb-3"><label class="form-label">Site Title</label><input type="text" class="form-control" id="siteTitle"></div>
+                            <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" id="siteDescription" rows="3"></textarea></div>
+                        </div></div></div>
+                        <div class="col-md-6"><div class="card h-100"><div class="card-body"><h5>Maintenance</h5>
+                            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="maintenanceMode"><label class="form-check-label" for="maintenanceMode">Enable</label></div>
+                            <div class="mt-3" id="maintenanceMessageField" style="display: none;"><label class="form-label">Message</label><textarea class="form-control" id="maintenanceMessage" rows="3"></textarea></div>
+                        </div></div></div>
+                    </div><button type="submit" class="btn btn-primary mt-4">Save</button></form>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="confirmationModal"><div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Confirm</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">Are you sure?</div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-danger" id="confirmAction">Confirm</button></div>
+    </div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentAdmin = null;
+        const API_BASE = 'http://localhost:3000';
+        
+        // Charts
+        const trafficChart = new Chart(document.getElementById('trafficChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Downloads',
+                    data: [],
+                    borderColor: '#0d6efd',
+                    tension: 0.4
+                }, {
+                    label: 'Visits',
+                    data: [],
+                    borderColor: '#198754',
+                    tension: 0.4
+                }]
+            }
+        });
+
+        const uploadsChart = new Chart(document.getElementById('uploadsChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Apps',
+                    data: [],
+                    backgroundColor: '#ffc107'
+                }]
+            }
+        });
+
+        // Data Fetching
+        async function fetchData(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network error');
+                return await response.json();
+            } catch (error) {
+                console.error('Fetch error:', error);
+                return null;
+            }
+        }
+
+        async function loadDashboard() {
+            const stats = await fetchData(`${API_BASE}/stats`);
+            const apps = await fetchData(`${API_BASE}/admin/apps?user_id=${currentAdmin.user_id}`);
+            const users = await fetchData(`${API_BASE}/admin/users?user_id=${currentAdmin.user_id}`);
+
+            // Update stats
+            if(stats) {
+                document.getElementById('total-downloads').textContent = stats.downloads;
+                document.getElementById('total-visits').textContent = stats.visits;
+                document.getElementById('total-users').textContent = users?.length || 0;
+                document.getElementById('pending-apps').textContent = apps?.filter(a => a.status === 'pending').length || 0;
+            }
+
+            // Update apps table
+            if(apps) {
+                document.getElementById('appsTable').innerHTML = apps.map(app => `
+                    <tr>
+                        <td>${app.name}</td>
+                        <td>${app.developer_id}</td>
+                        <td>${new Date(app.created_at).toLocaleDateString()}</td>
+                        <td><span class="badge ${app.status === 'approved' ? 'bg-success' : 'bg-warning'}">${app.status}</span></td>
+                        <td>
+                            ${app.status === 'pending' ? `
+                                <button class="btn btn-sm btn-success approve-btn" data-id="${app.app_id}">Approve</button>
+                                <button class="btn btn-sm btn-danger reject-btn" data-id="${app.app_id}">Reject</button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Update users
+            if(users) {
+                const clients = users.filter(u => u.type === 'client');
+                const developers = users.filter(u => u.type === 'developer');
+                
+                document.getElementById('clientsTable').innerHTML = clients.map(user => `
+                    <tr>
+                        <td>${user.full_name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.downloads || 0}</td>
+                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                        <td><button class="btn btn-sm btn-danger delete-user" data-id="${user.user_id}">Delete</button></td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('developersTable').innerHTML = developers.map(user => `
+                    <tr>
+                        <td>${user.company_name}</td>
+                        <td>${user.app_count || 0}</td>
+                        <td>${user.approved_apps || 0}</td>
+                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                        <td><button class="btn btn-sm btn-danger delete-user" data-id="${user.user_id}">Delete</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Simulate login (replace with actual login flow)
+            currentAdmin = { user_id: 1, type: 'admin' };
+            
+            await loadDashboard();
+            setInterval(loadDashboard, 300000);
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('section').forEach(s => s.classList.add('d-none'));
+                    document.querySelector(link.getAttribute('href')).classList.remove('d-none');
+                });
+            });
+
+            document.getElementById('appsTable').addEventListener('click', async (e) => {
+                if(e.target.classList.contains('approve-btn')) {
+                    const appId = e.target.dataset.id;
+                    await fetch(`${API_BASE}/apps/${appId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'approved', user_id: currentAdmin.user_id })
+                    });
+                    await loadDashboard();
+                }
+            });
+        });
+
+        document.getElementById('maintenanceMode').addEventListener('change', function() {
+            document.getElementById('maintenanceMessageField').style.display = 
+                this.checked ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>

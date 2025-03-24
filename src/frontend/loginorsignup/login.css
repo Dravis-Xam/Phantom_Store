@@ -1,0 +1,161 @@
+/* Dark background overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .form-container {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s ease;
+  }
+  
+  .form-wrapper {
+    display: flex;
+    transition: transform 0.4s ease;
+  }
+  
+  .auth-form {
+    padding: 2rem;
+    min-width: 100%;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s ease;
+    position: absolute;
+  }
+  
+  .auth-form.active {
+    opacity: 1;
+    transform: translateX(0);
+    position: relative;
+  }
+  
+  /* Floating label styles */
+  .input-group {
+    position: relative;
+    margin: 1.5rem 0;
+    width: 90%;
+  }
+  
+  .input-group input {
+    width: 90%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .input-group label {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    background: white;
+    padding: 0 0.5rem;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .input-group input:focus,
+  .input-group input:not(:placeholder-shown) {
+    border-color: #2196F3;
+    outline: none;
+  }
+  
+  .input-group input:focus + label,
+  .input-group input:not(:placeholder-shown) + label {
+    top: 0;
+    font-size: 0.8rem;
+    color: #2196F3;
+    transform: translateY(-50%);
+  }
+  
+  /* Button styles */
+  button[type="submit"] {
+    width: 88%;
+    padding: 10px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  button[type="submit"]:hover {
+    background: #1976D2;
+  }
+  
+  .form-toggle {
+    padding: 1rem;
+    text-align: center;
+    background: #f5f5f5;
+  }
+  
+  .form-toggle button {
+    background: none;
+    border: none;
+    color: #2196F3;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .form-toggle button:hover {
+    text-decoration: underline;
+  }
+
+  /* Add these styles to your existing CSS */
+
+/* Style the role dropdown */
+.input-group select {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    font-family: Noto sans;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: white;
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .input-group select:focus {
+    border-color: #2196F3;
+    outline: none;
+  }
+  
+  /* Dropdown arrow */
+  .select-group::after {
+    content: "▼";
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    pointer-events: none;
+  }
+  
+  .input-group select:focus + label,
+  .input-group select:valid + label {
+    top: 0;
+    font-size: 0.8rem;
+    color: #2196F3;
+    transform: translateY(-50%);
+  }

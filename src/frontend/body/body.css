@@ -1,0 +1,358 @@
+.body {
+    position: relative;
+    top: 120px;
+    padding: 20px;
+}
+button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all .5s cubic-bezier(0.215, 0.610, 0.355, 1);
+}
+.dir {
+    display: none;
+    width: fit-content;
+    position: absolute;
+    top: -20px;
+    left: 40px;
+    align-items: center;
+    justify-content: space-evenly;
+    transition: all .5s cubic-bezier(0.215, 0.610, 0.355, 1);
+    gap: 6px;
+}
+.dir:nth-child(1) {
+    color: blue;
+}
+
+/* Slider container */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    padding-bottom: 50px;
+}
+
+/* Inner container for the slider */
+.carousel-container-inner {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Track for the slides */
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Individual slide */
+.carousel-slide {
+    flex: 0 0 33.333%;
+    box-sizing: border-box;
+    position: relative;
+    height: 100%;
+    margin: 0 25px;
+}
+
+/* Slide image */
+.carousel-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+/* Navigation buttons */
+.showPrevSlidebtn,
+.showNextSlidebtn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(122, 122, 122, 0.5);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 10;
+}
+
+.showPrevSlidebtn {
+    left: -250px;
+}
+
+.showNextSlidebtn {
+    right: -250px;
+}
+
+/* Fade effect at the ends */
+.carousel-container::before,
+.carousel-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 250px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.carousel-container::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+.carousel-container::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .carousel-slide {
+        flex: 0 0 100%;
+        margin: 0 10px;
+    }
+    
+    .showPrevSlidebtn {
+        left: -0px;
+    }
+
+    .showNextSlidebtn {
+        right: -0px;
+    }
+    .carousel-container::before,
+    .carousel-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+}
+
+/* Slider card container */
+.slider-card {
+    position: absolute;
+    bottom: -110px;
+    left: 0;
+    right: 0;
+    color: rgb(12, 12, 12);
+    padding: 5px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+
+/* Content inside the slider card */
+.slider-card-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* App icon */
+.app-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+/* App details */
+.app-details {
+    flex: 1;
+}
+
+/* App name */
+.app-name {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* App stats (rating and downloads) */
+.app-stats {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #ccc;
+}
+
+/* Rating icon */
+.rating-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* Separator between rating and downloads */
+.separator {
+    font-size: 12px;
+}
+
+/* Download button */
+.download-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.download-button:hover {
+    background: #0056b3;
+}
+
+.catch-line {
+    margin: 0 50px;
+}
+
+.category-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.category-inner {
+    display: flex;
+    gap: 25px;
+    overflow: hidden;
+    position: relative;
+    max-height: 500px; /* adjust based on your content height */
+    transition: all 0.3s ease-in-out;
+    padding-right: 20px; /* space for fade effect */
+    scroll-behavior: smooth;
+    overflow-x: auto;
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none;
+}
+
+.category-inner::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+.category-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100px;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    pointer-events: none;
+}
+
+.category-inner.collapsed {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.category-app-card {
+    display: flex;
+    position: relative;
+    flex-wrap: nowrap;
+    border-radius: 10px;
+    flex-direction: column;
+    margin-bottom: 20px;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 8px;
+    box-shadow: 0 2px 5px rgb(216, 216, 216);
+    min-width: 300px;
+}
+
+.category-app-card > div {
+    gap: 5px;
+    display: flex;
+    width: 100%;
+}
+.category-app-card > div > img {
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+    width: 100px;
+}
+
+.category-app-desc > .app-desc {
+    font-size: 14px;
+    color: rgba(4, 143, 185, 0.822);
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    position: absolute;
+    width: 50px;
+    text-align: center;
+    gap: 30px;
+    bottom: 60px;
+    right: 130px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.category-app-desc > small {
+    font-size: 10px;
+    color: grey;
+}
+
+.category-app-desc > .separator {
+    margin: 0 5px;
+}
+
+.get-app-button {
+    background-color: #007bff;
+    color: white;
+    width: 100%;
+    border-radius: 30px;
+    padding: 5px 8px;
+    transition: all .5s cubic-bezier(0.215, 0.610, 0.355, 1);
+    margin-top: 10px;
+}
+
+.get-app-button:hover {
+    box-shadow: 0 2px 5px rgb(187, 185, 185);
+    background-color: #0056b3;
+}
+
+.category-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
+
+.toggleCategoryBtn {
+    transition: transform 0.3s ease-in-out;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.showNextAppsBtn {
+    position: absolute;
+    z-index: 500;
+    right: 20px;
+    top: 50%;
+    background-color: rgba(0, 0, 0, 0.479);
+    color: white;
+    padding: 8px;
+}
+
+.showNextAppsBtn:disabled {
+    opacity: 0;
+    pointer-events: none;
+}
