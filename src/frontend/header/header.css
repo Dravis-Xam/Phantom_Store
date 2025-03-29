@@ -416,11 +416,12 @@ body, button {
         right: 0;
         gap: 5px;
         left: 0;
-        width: 100%;
+        width: 99%;
         z-index: 100;
         border-top: .3px solid rgb(170, 168, 168);
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
+        display: flex;
     }
 
     .category-dropdown, .more-dropdown {
@@ -476,7 +477,7 @@ body, button {
         display: inline;
     }
     .link-container > button {
-        width: 100px;
+        width: 48px;
     }
     .link-container:hover > button {
         border: none;

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Store | Login or signup</title>
+</head>
+<body>
+    <div class="modal-overlay">
+        <div class="form-container" id="formContainer">
+            <div class="form-wrapper">
+                <form id="loginForm" class="auth-form active">
+                    <h2>Login</h2>
+                    <div class="input-group">
+                        <input 
+                            type="email" 
+                            name="email"
+                            id="loginEmail"
+                            placeholder=" "
+                            required
+                        />
+                        <label>Email</label>
+                    </div>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            name="password"
+                            id="loginPassword"
+                            placeholder=" "
+                            required
+                        />
+                        <label>Password</label>
+                    </div>
+                    <button type="submit">Sign In</button>
+                </form>
+
+                <form id="signupForm" class="auth-form">
+                    <h2>Create Account</h2>
+                    <div class="input-group">
+                        <input type="text" name="username" id="signupUsername" placeholder=" " required />
+                        <label>Username</label>
+                    </div>
+                    <div class="input-group">
+                        <input 
+                            type="email" 
+                            name="email"
+                            id="signupEmail"
+                            placeholder=" "
+                            required
+                        />
+                        <label>Email</label>
+                    </div>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            name="password"
+                            id="signupPassword"
+                            placeholder=" "
+                            required
+                        />
+                        <label>Password</label>
+                    </div>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            name="confirmPassword"
+                            id="signupConfirmPassword"
+                            placeholder=" "
+                            required
+                        ></div>
+                        <label>Confirm Password</label>
+                    </div>
+                    <div class="input-group select-group">
+                        <select
+                            name="role"
+                            id="signupRole"
+                            required
+                        >
+                            <option value="" disabled selected>Select your role</option>
+                            <option value="Developer">Developer</option>
+                            <option value="Client">Client</option>
+                        </select>
+                        <label>Role</label>
+                    </div>
+                    <button type="submit">Sign Up</button>
+                </form>
+            </div>
+
+            <div class="form-toggle">
+                <button id="toggleButton">
+                    Need an account? Sign Up
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formContainer = document.getElementById('formContainer');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const toggleButton = document.getElementById('toggleButton');
+            let isLogin = true;
+
+            // Toggle between login and signup forms
+            toggleButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                isLogin = !isLogin;
+                
+                if (isLogin) {
+                    loginForm.classList.add('active');
+                    signupForm.classList.remove('active');
+                    toggleButton.textContent = 'Need an account? Sign Up';
+                    formContainer.classList.remove('signup-mode');
+                } else {
+                    loginForm.classList.remove('active');
+                    signupForm.classList.add('active');
+                    toggleButton.textContent = 'Already have an account? Login';
+                    formContainer.classList.add('signup-mode');
+                }
+            });
+
+            // Handle login form submission
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                try {
+                    const response = await fetch('http://localhost:3000/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        localStorage.setItem('currentUser', JSON.stringify(data.user));
+                        
+                        if (data.user.type === 'developer') {
+                            window.location.href = 'http://localhost:5173/developers-panel.html';
+                        } else {
+                            window.location.href = 'http://localhost:5173/';
+                        }
+                    } else {
+                        alert(data.error || 'Login failed');
+                    }
+                } catch (error) {
+                    alert('Login error: ' + error.message);
+                }
+            });
+
+            // Handle signup form submission
+            signupForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('signupUsername').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const confirmPassword = document.getElementById('signupConfirmPassword').value;
+                const role = document.getElementById('signupRole').value;
+                
+                if (password !== confirmPassword) {
+                    alert("Passwords don't match!");
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://localhost:3000/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: username,
+                            email: email,
+                            password: password,
+                            type: role.toLowerCase()
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        localStorage.setItem('currentUser', JSON.stringify(data.user));
+                        
+                        if (data.user.type === 'developer') {
+                            window.location.href = 'http://localhost:5173/developers-panel.html';
+                        } else {
+                            window.location.href = 'http://localhost:5173/';
+                        }
+                    } else {
+                        alert(data.error || 'Registration failed');
+                    }
+                } catch (error) {
+                    alert('Registration error: ' + error.message);
+                }
+            });
+
+            // Add label animation for input fields
+            document.querySelectorAll('.input-group input, .input-group select').forEach(input => {
+                input.addEventListener('focus', function() {
+                    const label = this.nextElementSibling;
+                    if (label && label.tagName === 'LABEL') {
+                        label.style.top = '-0.5rem';
+                        label.style.left = '0.5rem';
+                        label.style.fontSize = '0.75rem';
+                        label.style.backgroundColor = 'white';
+                        label.style.padding = '0 0.25rem';
+                        label.style.color = '#333';
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    const label = this.nextElementSibling;
+                    if (label && label.tagName === 'LABEL') {
+                        if (!this.value) {
+                            label.style.top = '0.75rem';
+                            label.style.left = '0.75rem';
+                            label.style.fontSize = '1rem';
+                            label.style.backgroundColor = 'transparent';
+                            label.style.padding = '0';
+                            label.style.color = '#999';
+                        }
+                    }
+                });
+
+                // Initialize labels based on existing values
+                if (input.value) {
+                    const label = input.nextElementSibling;
+                    if (label && label.tagName === 'LABEL') {
+                        label.style.top = '-0.5rem';
+                        label.style.left = '0.5rem';
+                        label.style.fontSize = '0.75rem';
+                        label.style.backgroundColor = 'white';
+                        label.style.padding = '0 0.25rem';
+                        label.style.color = '#333';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

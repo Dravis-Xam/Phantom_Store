@@ -112,32 +112,7 @@ button {
     background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-    .carousel-slide {
-        flex: 0 0 100%;
-        margin: 0 10px;
-    }
-    
-    .showPrevSlidebtn {
-        left: -0px;
-    }
 
-    .showNextSlidebtn {
-        right: -0px;
-    }
-    .carousel-container::before,
-    .carousel-container::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 40px;
-        z-index: 1;
-        pointer-events: none;
-    }
-
-}
 
 /* Slider card container */
 .slider-card {
@@ -270,7 +245,7 @@ button {
     align-items: center;
     padding: 8px;
     box-shadow: 0 2px 5px rgb(216, 216, 216);
-    min-width: 300px;
+    min-width: 250px;
 }
 
 .category-app-card > div {
@@ -355,4 +330,61 @@ button {
 .showNextAppsBtn:disabled {
     opacity: 0;
     pointer-events: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .carousel-slide {
+        flex: 0 0 70%;
+        margin: 0 10px;
+    }
+
+    .carousel-track {
+        position: relative;
+    }
+
+    .slider-card {
+        width: 100px;
+        bottom: -120px;
+    }
+
+    .slider-card-content {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+    
+    .showPrevSlidebtn {
+        left: -0px;
+    }
+
+    .showNextSlidebtn {
+        right: -0px;
+    }
+    .carousel-container::before,
+    .carousel-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .app-details {
+        flex: 1;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .app-icon {
+        margin: none;
+        display: none;
+    }
+
+    .category-app-desc > .app-desc {
+        gap: 10px;
+        left: 120px;
+    }    
+
 }

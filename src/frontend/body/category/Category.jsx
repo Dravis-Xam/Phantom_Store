@@ -7,8 +7,8 @@ export default function Category({ category }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [scrollPosition, setScrollPosition] = useState(0);
     const categoryInnerRef = useRef(null);
-    const cardWidth = 300; // Should match your CSS min-width
-    const gap = 25; // Should match your CSS gap
+    const cardWidth = 250; // Should match your CSS min-width
+    let gap = 25; // Should match your CSS gap
  
 
     let apps = [
@@ -51,6 +51,10 @@ export default function Category({ category }) {
             const scrollAmount = 2 * (cardWidth + gap);
             const newPosition = scrollPosition + scrollAmount;
             
+            if (window.innerWidth < 768) {
+                gap=10
+            }
+
             // Calculate max scroll position
             const maxScroll = container.scrollWidth - container.clientWidth;
             
