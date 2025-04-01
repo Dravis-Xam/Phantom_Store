@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoHomeOutline } from "react-icons/io5";
 import { FaGamepad } from "react-icons/fa";
@@ -19,6 +19,12 @@ import { FaLaptop } from "react-icons/fa";
 
 export default function Nav() {
   const styles = {width: 35, height: 35 }
+  const [pending, setPending] = useState('false');
+
+  useEffect(()=>{
+    setPending(!pending);
+  }, [pending])
+
   return (
     <div className='nav'>
       <div className='link-container'>
@@ -26,26 +32,23 @@ export default function Nav() {
           <span style={styles} className='link-icon'><IoHomeOutline /></span>
           Home
         </button>
-        
       </div>
       <div className='link-container'>
         <button>
           <span style={styles} className='link-icon'><FaGamepad /></span>
           Games
         </button>
-        
       </div>
       <div className='link-container'>
         <button>
           <span style={styles} className='link-icon'><GrAppsRounded /></span>
           Apps
         </button>
-        
       </div>
       <div className='link-container link-link'>
         <button>
           <span style={styles} className='link-icon'><MdOutlineCategory /></span>
-           Categories
+            Categories
         </button>
         <div className="category-dropdown">
           <div className="category-dropdown-container">
@@ -64,7 +67,7 @@ export default function Nav() {
         <div className="more-dropdown">
           <div className="more-container">
             <div className="more-stats">
-              <div className='more-stats-title'><span className='floating-count-label'>3</span><img src={download} alt="..." /><span className="text">Downloads</span></div>
+              <div className='more-stats-title'><span className='floating-count-label'>{pending ? <div><img src={checked} alt="..." height={15} width={15}/></div>: 3}</span><img src={download} alt="..." /><span className="text">Downloads</span></div>
               <div><img src={trophy} alt="..." /><span className="text">Achievements</span></div>
               <div><span className='floating-count-label'>3</span><img src={hourglass} alt="..." /><span className="text">Pending Downloads</span></div>
             </div>
@@ -72,7 +75,7 @@ export default function Nav() {
               <PiDownloadSimpleFill />Downloads
             </button>
             <button className='option-button'>
-              <MdLibraryBooks />Library
+              <MdLibraryBooks />Recents
             </button>
             <button className='option-button'>
               <IoIosSettings />Settings
