@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Technologies | Corporate Blog</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        body.dark-mode {
+            background-color: #121212;
+            color: var(--light);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 60px 0 80px;
+            text-align: center;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+            margin-bottom: -30px;
+        }
+        
+        
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+         
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .dark-mode header {
+            background: linear-gradient(135deg, #1a2a3a, #2874a6);
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+        
+        .blog-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .card-header {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .card-body h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .card-body p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--primary);
+        }
+        
+        /* [Previous CSS remains exactly the same until .dark-mode additions] */
+        
+        .dark-mode .blog-card,
+        .dark-mode .chart-container,
+        .dark-mode .history-section {
+            background: #1e1e1e;
+            color: var(--light);
+        }
+        
+        .dark-mode .card-body p,
+        .dark-mode .history-section p {
+            color: #cccccc;
+        }
+        
+        .dark-mode .btn {
+            background: var(--accent);
+        }
+        
+        /* Dark mode toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        /* Newsletter form */
+        .newsletter {
+            background: var(--light);
+            padding: 40px;
+            border-radius: 10px;
+            margin: 60px 0;
+            text-align: center;
+        }
+        
+        .dark-mode .newsletter {
+            background: #252525;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 20px auto 0;
+        }
+        
+        .newsletter input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+        
+        .dark-mode .newsletter input {
+            background: #333;
+            border-color: #444;
+            color: white;
+        }
+        
+        .newsletter button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        /* History Section */
+        .history-section {
+            background: var(--light);
+            padding: 60px 0;
+            margin: 60px 0;
+        }
+        
+        /* Stakeholders Section */
+        .stakeholders {
+            text-align: center;
+            margin: 60px 0;
+        }
+        
+        .profile-grid {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .profile-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid white;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: 0 -15px;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .profile-circle:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        
+        .profile-circle:nth-child(1) { background-image: url('https://randomuser.me/api/portraits/women/44.jpg'); }
+        .profile-circle:nth-child(2) { background-image: url('https://randomuser.me/api/portraits/men/32.jpg'); }
+        .profile-circle:nth-child(3) { background-image: url('https://randomuser.me/api/portraits/women/68.jpg'); }
+        .profile-circle:nth-child(4) { background-image: url('https://randomuser.me/api/portraits/men/75.jpg'); }
+        .profile-circle:nth-child(5) { background-image: url('https://randomuser.me/api/portraits/women/63.jpg'); }
+        
+        /* Charts Section */
+        .charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .chart-placeholder {
+            height: 300px;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            background: var(--primary);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            width: 100%;
+            right: 0;
+            left: 0;
+            position: relative;
+            border-radius: 0 25px;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .contact-card {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .contact-card i {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 60px;
+            position: relative;
+            width: 100%;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            border-radius: 25px 25px 0 0;
+        }
+        
+        @media (max-width: 768px) {
+            .charts {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-circle {
+                width: 80px;
+                height: 80px;
+                margin: 0 -10px;
+            }
+        }
+        /* [Rest of previous CSS remains unchanged] */
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <header>
+        <div class="container">
+            <h1>Phantom Technologies</h1>
+            <p>Innovating the future through cutting-edge technological solutions</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Newsletter Section -->
+        <section class="newsletter">
+            <h2>Stay Updated</h2>
+            <p>Subscribe to our newsletter for the latest Phantom Technologies news and insights</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Your email address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </section>
+        
+        <!-- [Previous blog-grid content unchanged] -->
+        <div class="blog-grid">
+            <div class="blog-card">
+                <div class="card-header" style="background-image: url('https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
+                <div class="card-body">
+                    <h2>Our Journey Through Time</h2>
+                    <p>Explore the remarkable evolution of Phantom Technologies from its humble beginnings to becoming an industry leader in innovative solutions.</p>
+                    <a href="#history" class="btn">Read History</a>
+                </div>
+            </div>
+            
+            <div class="blog-card">
+                <div class="card-header" style="background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
+                <div class="card-body">
+                    <h2>Building the Future Together</h2>
+                    <p>Discover our diverse team of visionaries and experts who are driving Phantom Technologies forward with passion and expertise.</p>
+                    <a href="#leadership" class="btn">Meet Our Team</a>
+                </div>
+            </div>
+            
+            <div class="blog-card">
+                <div class="card-header" style="background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
+                <div class="card-body">
+                    <h2>By the Numbers</h2>
+                    <p>See how Phantom Technologies is growing and making an impact through our latest performance metrics and achievements.</p>
+                    <a href="#stats" class="btn">View Statistics</a>
+                </div>
+            </div>
+        </div>
+        
+        <section id="history" class="history-section">
+            <div class="container">
+                <h2>Our Development Story</h2>
+                <p>Founded in 2012 by a group of visionary engineers, Phantom Technologies began as a small startup with a bold mission: to revolutionize the way businesses interact with technology. Our first breakthrough came in 2015 with the development of our proprietary AI algorithms that would later become the foundation of our product suite.</p>
+                
+                <p>By 2018, we had expanded our operations to three continents and secured partnerships with Fortune 500 companies. The pandemic years of 2020-2021 marked a turning point as our remote collaboration tools became essential for businesses worldwide, leading to 300% growth in just 18 months.</p>
+                
+                <p>Today, Phantom Technologies stands as a leader in enterprise solutions with over 1,200 employees globally and a commitment to sustainable, ethical technology development.</p>
+                
+                <h3 style="margin-top: 30px;">Key Milestones</h3>
+                <ul style="margin-left: 20px; margin-top: 15px;">
+                    <li style="margin-bottom: 10px;">2012 - Company founded in Silicon Valley</li>
+                    <li style="margin-bottom: 10px;">2015 - Launch of first commercial product</li>
+                    <li style="margin-bottom: 10px;">2018 - International expansion begins</li>
+                    <li style="margin-bottom: 10px;">2020 - Named "Fastest Growing Tech Company" by TechReview</li>
+                    <li style="margin-bottom: 10px;">2022 - Reached $1B valuation</li>
+                    <li style="margin-bottom: 10px;">2023 - Launched Phantom Green Initiative</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Enhanced Leadership Section -->
+        <section class="stakeholders">
+            <div class="container">
+                <h2>Our Leadership Team</h2>
+                <p>The brilliant minds shaping the future of Phantom Technologies</p>
+                
+                <div class="profile-grid">
+                    <div class="profile-circle" 
+                        data-bio="Sarah Chen, CEO | Founder of Phantom Technologies | 15+ years in tech entrepreneurship | Led company from garage startup to $1B valuation"
+                        style="background-image: url('https://randomuser.me/api/portraits/women/44.jpg')"></div>
+                    
+                    <div class="profile-circle" 
+                        data-bio="Michael Rodriguez, CTO | AI/ML Specialist | Former Lead Engineer at Google | PhD in Computer Science from Stanford"
+                        style="background-image: url('https://randomuser.me/api/portraits/men/32.jpg')"></div>
+                    
+                    <div class="profile-circle" 
+                        data-bio="Aisha Johnson, CFO | Financial Strategist | Former Wall Street Analyst | Scaled 3 startups to successful IPOs"
+                        style="background-image: url('https://randomuser.me/api/portraits/women/68.jpg')"></div>
+                    
+                    <div class="profile-circle" 
+                        data-bio="David Kim, VP Product | UX Visionary | Created award-winning enterprise products | 12 patents in human-computer interaction"
+                        style="background-image: url('https://randomuser.me/api/portraits/men/75.jpg')"></div>
+                    
+                    <div class="profile-circle" 
+                        data-bio="Emily Wong, VP Engineering | Systems Architect | Built scalable infrastructure serving 10M+ users | Open source contributor"
+                        style="background-image: url('https://randomuser.me/api/portraits/women/63.jpg')"></div>
+                </div>
+                
+                <div id="bioDisplay" class="bio-display">
+                    <p>Click on any team member to view their bio</p>
+                </div>
+                
+                <div style="margin-top: 50px;">
+                    <h3>Join Our Growing Team</h3>
+                    <p>We're always looking for exceptional talent to join our mission of technological innovation.</p>
+                    <a href="#careers" class="btn" style="margin-top: 20px;">View Open Positions</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Interactive Charts Section -->
+        <section class="charts">
+            <div class="chart-container">
+                <h2>Market Performance</h2>
+                <canvas id="growthChart" height="300"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Product Distribution</h2>
+                <canvas id="productChart" height="300"></canvas>
+            </div>
+        </section>
+        
+        <!-- [Rest of previous content unchanged] -->
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <h2>Get In Touch</h2>
+                <p>We'd love to hear from you. Reach out for partnerships, media inquiries, or career opportunities.</p>
+                
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Headquarters</h3>
+                        <p>123 Tech Boulevard<br>San Francisco, CA 94107<br>United States</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>Phone</h3>
+                        <p>+1 (800) 555-TECH<br>Mon-Fri: 9am-6pm PST</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <i class="fas fa-envelope"></i>
+                        <h3>Email</h3>
+                        <p>info@phantom.tech<br>support@phantom.tech</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <div class="container">
+                <p>&copy; 2023 Phantom Technologies. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Dark Mode Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const icon = themeToggle.querySelector('i');
+            if(document.body.classList.contains('dark-mode')) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        });
+
+        // Interactive Profile Bios
+        const profiles = document.querySelectorAll('.profile-circle');
+        const bioDisplay = document.getElementById('bioDisplay');
+        
+        profiles.forEach(profile => {
+            profile.addEventListener('click', () => {
+                bioDisplay.innerHTML = `<p>${profile.dataset.bio}</p>`;
+            });
+        });
+
+        // Chart.js Implementation
+        const growthCtx = document.getElementById('growthChart').getContext('2d');
+        const growthChart = new Chart(growthCtx, {
+            type: 'line',
+            data: {
+                labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+                datasets: [{
+                    label: 'Annual Revenue (Millions)',
+                    data: [45, 62, 88, 145, 210, 320],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false
+            }
+        });
+
+        const productCtx = document.getElementById('productChart').getContext('2d');
+        const productChart = new Chart(productCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Enterprise Solutions', 'AI Tools', 'Security', 'Other'],
+                datasets: [{
+                    data: [45, 30, 15, 10],
+                    backgroundColor: [
+                        '#3498db',
+                        '#2ecc71',
+                        '#e74c3c',
+                        '#f39c12'
+                    ]
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Newsletter Form Handling
+        const newsletterForm = document.querySelector('.newsletter-form');
+        newsletterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = e.target.querySelector('input').value;
+            // In a real implementation, you would send this to your server
+            alert(`Thank you for subscribing with ${email}!`);
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>

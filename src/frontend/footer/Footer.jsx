@@ -69,10 +69,10 @@ export default function Footer() {
                     </button>
                 </div>
                 <div className={`about-store-links ${collapsedSections.about ? 'collapsed' : ''}`}>
-                    <a href="">FAQs</a>
-                    <a href="">Support</a>
-                    <a href="">Contact Us</a>
-                    <a href="">Blog</a>
+                    <a href="company-information.html#faq" target='_blank'>FAQs</a>
+                    <a href="company-information.html#support" target='_blank'>Support</a>
+                    <a href="company-information.html#contact" target='_blank'>Contact Us</a>
+                    <a href="blog.html" target='_blank'>Blog</a>
                 </div>
             </div>
 
@@ -87,17 +87,17 @@ export default function Footer() {
                     </button>
                 </div>
                 <div className={`know-us-links ${collapsedSections.knowUs ? 'collapsed' : ''}`}>
-                    <a href="">The Company</a>
-                    <a href="">Products</a>
-                    <a href="">About Us</a>
-                    <a href="">Careers</a>
+                    <a href="company-information.html#our-company" target='_blank'>The Company</a>
+                    <a href="company-information.html#our-products" target='_blank'>Products</a>
+                    <a href="company-information.html#about-us" target='_blank'>About Us</a>
+                    <a href="company-information.html#careers" target='_blank'>Careers</a>
                 </div>
             </div>
 
             <div className='our-products-container'>
                 <div className="our-products-title">
                     <h3>Our Products</h3>
-                    <button 
+                    <button
                         onClick={() => toggleSection('products')}
                         style={{ transform: `rotate(${collapsedSections.products ? '0deg' : '180deg'})` }}
                     >
@@ -105,9 +105,9 @@ export default function Footer() {
                     </button>
                 </div>
                 <div className={`our-products-links ${collapsedSections.products ? 'collapsed' : ''}`}>
-                    <a href="">App Store</a>
-                    <a href="">iOS</a>
-                    <a href="">TVs</a>
+                    <a href="company-information.html#app-store" target='_blank'>App Store</a>
+                    <a href="company-information.html#ios" target='_blank'>iOS</a>
+                    <a href="company-information.html#tvs" target='_blank'>TVs</a>
                 </div>
             </div>
         <br />
