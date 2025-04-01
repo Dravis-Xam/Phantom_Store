@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Phantom Store | Company Information</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: wheat;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+            font-family: 'Noto sans', arial;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 30px 0;
+            color: #000000;
+            font-family: Noto sans, arial;
+            font-weight: 1000;
+        }
+        
+        .sections-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-direction: column;
+        }
+        
+        .section {
+            flex: 1;
+            min-width: 250px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-header:hover {
+            background: #2980b9;
+        }
+        
+        .section-header h2 {
+            font-size: 18px;
+        }
+        
+        .dropdown-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .section-content {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.215, 0.610, 0.355, 1), padding 0.3s ease;
+        }
+        
+        .section.active .section-content {
+            padding: 15px;
+            max-height: 1000px;
+        }
+        
+        .section.active .dropdown-icon {
+            transform: rotate(180deg);
+        }
+        
+        .section-content ul {
+            list-style: none;
+        }
+        
+        .section-content li {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-content li:last-child {
+            border-bottom: none;
+        }
+        
+        .section-content a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.2s;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .section-content a:hover {
+            color: #2980b9;
+        }
+        
+        .item-details {
+            font-size: 14px;
+            color: #666;
+            margin-top: 8px;
+            padding-left: 10px;
+            border-left: 3px solid #eee;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px 30px;
+            background: #2c3e50;
+            color: white;
+            margin-top: 40px;
+            position: relative;
+            left: 0;
+            right: 0;
+            border-radius: 50px;
+        }
+        
+        @media (max-width: 768px) {
+            .section {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Company Information</h1>
+        
+        <div class="sections-container">
+            <!-- About Store Section -->
+            <div class="section" id="about-store"  onclick="toggleSection(this)">
+                <div class="section-header">
+                    <h2>About Store</h2>
+                    <span class="dropdown-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <ul>
+                        <li id="faq">
+                            <a href="#">FAQs</a>
+                            <div class="item-details">
+                                <p>Find answers to common questions about our products, services, and policies. Our comprehensive FAQ section covers everything from account setup to troubleshooting.</p>
+                                <p>Last updated: June 2023 | 125 questions available</p>
+                            </div>
+                        </li>
+                        <li id="support">
+                            <a href="#">Support</a>
+                            <div class="item-details">
+                                <p>Our dedicated support team is available 24/7 to help with any issues you may encounter. Contact us via live chat, email, or phone.</p>
+                                <p>Response time: &lt; 2 hours | Satisfaction rate: 98%</p>
+                            </div>
+                        </li>
+                        <li id="contact-us">
+                            <a href="#">Contact Us</a>
+                            <div class="item-details">
+                                <p>Corporate Headquarters: 123 Business Ave, Suite 100, San Francisco, CA 94107</p>
+                                <p>Phone: (800) 555-1234 | Email: info@company.com</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Know Us Section -->
+            <div class="section" id="know-us-section" onclick="toggleSection(this)">
+                <div class="section-header">
+                    <h2>Know Us</h2>
+                    <span class="dropdown-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <ul>
+                        <li id="our-company">
+                            <a href="#">The Company</a>
+                            <div class="item-details">
+                                <p>Founded in 2010, we've grown from a small startup to a market leader with over 500 employees worldwide. Our mission is to simplify technology for everyday users.</p>
+                                <p>Active in 15 countries | 5 million customers</p>
+                            </div>
+                        </li>
+                        <li id="about-us">
+                            <a href="#">About Us</a>
+                            <div class="item-details">
+                                <p>Our diverse team of engineers, designers, and business professionals work together to create innovative solutions that make a difference in people's lives.</p>
+                                <p>Leadership team: 12 executives | 45% female representation</p>
+                            </div>
+                        </li>
+                        <li id="careers">
+                            <a href="#">Careers</a>
+                            <div class="item-details">
+                                <p>Join our growing team! We offer competitive salaries, comprehensive benefits, and opportunities for professional growth in a dynamic environment.</p>
+                                <p>Current openings: 23 positions | Remote options available</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Our Products Section -->
+            <div class="section" id="our-products" onclick="toggleSection(this)">
+                <div class="section-header">
+                    <h2>Our Products</h2>
+                    <span class="dropdown-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <ul>
+                        <li id="app-store">
+                            <a href="#">App Store</a>
+                            <div class="item-details">
+                                <p>Discover over 50,000 apps in our curated marketplace. All apps go through rigorous security and quality checks before being listed.</p>
+                                <p>Categories: Productivity, Games, Education, Health & more</p>
+                            </div>
+                        </li>
+                        <li id="ios">
+                            <a href="#">iOS</a>
+                            <div class="item-details">
+                                <p>Our iOS applications are optimized for all Apple devices, offering seamless performance and intuitive interfaces designed specifically for mobile users.</p>
+                                <p>Compatible with iPhone 8 and newer | iOS 14+</p>
+                            </div>
+                        </li>
+                        <li id="tvs">
+                            <a href="#">TVs</a>
+                            <div class="item-details">
+                                <p>Experience entertainment like never before with our smart TV platform featuring 4K resolution, voice control, and personalized recommendations.</p>
+                                <p>Available on Samsung, LG, Sony and other major brands</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        &copy; 2023 Company Name. All Rights Reserved.
+    </footer>
+    
+    <script>
+        function toggleSection(section) {
+            section.classList.toggle('active');
+            
+            // Close other sections when one is opened
+            if (section.classList.contains('active')) {
+                document.querySelectorAll('.section').forEach(sec => {
+                    if (sec !== section && sec.classList.contains('active')) {
+                        sec.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        // Open first section by default
+        document.querySelector('.section').classList.add('active');
+    </script>
+</body>
+</html>
