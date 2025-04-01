@@ -5,17 +5,24 @@ import Footer from './frontend/footer/Footer'
 import Header from './frontend/header/Header'
 import Login_signup_form from './frontend/loginorsignup/loginorsignup'
 import CheckAppProvider from './CheckAppContext'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
     <>
-      <CheckAppProvider>
-        <Header />
-        {/*<CheckApp />*/}
-        <Login_signup_form />
-        <Body />
-        <Footer />
-      </CheckAppProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/login' element={ <Login_signup_form /> } />
+          <Route path='/' element = {
+            <CheckAppProvider>
+              <Header />
+              <CheckApp />
+              <Body />
+              <Footer />
+            </CheckAppProvider>
+          } />
+        </Routes>
+      </BrowserRouter>
     </>
   )
 }

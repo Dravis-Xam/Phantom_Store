@@ -20,7 +20,7 @@ export default function SliderCard({ o }) {
                         <small className="downloads">{o.downloads}m</small>
                     </div>
                 </div>
-                <button className="download-button" onClick={() => showCheckApp(app)}>
+                <button className="download-button" onClick={() => showCheckApp(o)}>
                     Download
                 </button>
             </div>

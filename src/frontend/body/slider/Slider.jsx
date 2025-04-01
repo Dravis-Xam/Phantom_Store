@@ -71,7 +71,7 @@ export default function Slider() {
             <div className='carousel-container-inner'>
                 <div className='carousel-track' style={{ transform: `translateX(-${currentIndex * slideWidth}%)` }}>
                     {items.map((item, index) => (
-                        <div className='carousel-slide' key={item.id} onClick={() => showCheckApp(app)}>
+                        <div className='carousel-slide' key={item.id} onClick={() => showCheckApp(item)}>
                             <img src={item.bg} alt={item.title} className='carousel-image' />
                             <SliderCard o={item} key={index}/>
                         </div>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import './login.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginSignupForm() {
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -35,8 +37,12 @@ export default function LoginSignupForm() {
             
             if (data.user.type === 'developer') {
                 window.location.href = 'http://localhost:5173/developers-panel.html';
+            } else if (data.user.type === 'client') {
+                navigate('/');
+                window.location.href = 'http://localhost:5173/'
             } else {
                 window.location.href = 'http://localhost:5173/';
+                navigate('/');
             }
         } else {
             alert(data.error || 'Login failed');
@@ -72,8 +78,12 @@ export default function LoginSignupForm() {
             
             if (data.user.type === 'developer') {
                 window.location.href = 'http://localhost:5173/developers-panel.html';
+            } else if (data.user.type === 'client') {
+                navigate('/');
+                window.location.href = 'http://localhost:5173/'
             } else {
                 window.location.href = 'http://localhost:5173/';
+                navigate('/');
             }
         } else {
             alert(data.error || 'Registration failed');
