@@ -16,15 +16,13 @@ export default function Body() {
       try {
         setLoading(true);
         
-        // Fetch categories and featured apps in parallel
         const [categoriesResponse, featuredResponse] = await Promise.all([
-          fetch('http://localhost:3000/api/categories'),
-          fetch('http://localhost:3000/api/apps?featured=true')
+          fetch('http://localhost:3000/categories'),
+          fetch('http://localhost:3000/apps?featured=true')
         ]);
 
-        if (!categoriesResponse.ok || !featuredResponse.ok) {
-          throw new Error('Failed to fetch data');
-        }
+        if (!categoriesResponse.ok) throw new Error(`Categories error: ${categoriesResponse.status}`);
+        if (!featuredResponse.ok) throw new Error(`Apps error: ${featuredResponse.status}`);
 
         const [categoriesData, featuredData] = await Promise.all([
           categoriesResponse.json(),
@@ -77,12 +75,10 @@ export default function Body() {
       <Dir />
       <h3 className='catch-line'>Find any apps or games you want easy and free.</h3>
       
-      {/* Featured Apps Slider */}
       {featuredApps.length > 0 && (
         <Slider apps={featuredApps} />
       )}
 
-      {/* Categories List */}
       {categories.map((category) => (
         <Category 
           key={category.category_id} 

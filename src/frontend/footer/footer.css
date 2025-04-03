@@ -84,6 +84,9 @@
     .footer {
         flex-direction: column;
     }
+    .social-link {
+        padding: 0 10px;
+    }
 
     .about-title >  button,
     .know-us-title >  button,
