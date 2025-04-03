@@ -53,6 +53,7 @@ export default function Nav({ onSectionChange }) {
     <nav className="nav" role="navigation">
       {/* Home Link */}
       <div className="link-container">
+      <Link to='/'>
         <button 
           className={`nav-button ${activeSection === 'home' ? 'active' : ''}`}
           aria-label="Home"
@@ -61,8 +62,8 @@ export default function Nav({ onSectionChange }) {
           <span className="link-icon" style={iconStyles}>
             <IoHomeOutline />
           </span>
-          <span className="link-text">Home</span>
-        </button>
+          <span className="link-text home" id='home-button'>Home</span>
+        </button></Link>
       </div>
 
       {/* Games Link */}

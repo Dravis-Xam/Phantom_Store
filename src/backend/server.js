@@ -25,7 +25,7 @@ app.options('*', cors(corsOptions));
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: process.env.MYSQL_PASS, // Changed from VITE_MYSQL_PASS
+  password: process.env.MYSQL_PASS,
   database: 'appstore',
   waitForConnections: true,
   connectionLimit: 10,
@@ -48,7 +48,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Role Middleware (updated version)
+// Role Middleware
 const roleMiddleware = (role) => async (req, res, next) => {
   if (!req.user) return res.status(403).json({ error: 'Authentication required' });
   
@@ -74,7 +74,6 @@ const roleMiddleware = (role) => async (req, res, next) => {
 app.post('/register', async (req, res) => {
   const { username, email, password, type } = req.body;
 
-  // Default values for optional fields
   const defaults = {
     full_name: username,
     company_name: type === 'developer' ? 'Individual Developer' : null,
@@ -111,17 +110,9 @@ app.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Registration error:', {
-        message: error.message,
-        code: error.code,
-        sqlMessage: error.sqlMessage,
-        stack: error.stack
-    });
+    console.error('Registration error:', error);
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(409).json({ error: 'Email already exists' });
-    }
-    if (error.code === 'ER_ACCESS_DENIED_ERROR') {
-        return res.status(500).json({ error: 'Database access denied - check credentials' });
     }
     res.status(500).json({ error: 'Registration failed', details: error.message });
   }
@@ -138,7 +129,6 @@ app.post('/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) return res.status(401).json({ error: 'Invalid credentials' });
 
-    // Generate JWT token
     const token = jwt.sign(
       {
         user_id: user.user_id,
@@ -165,55 +155,83 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// App Routes
+// Categories Routes
+app.get('/categories', async (req, res) => {
+  try {
+    const [categories] = await pool.query(
+      'SELECT category_id, name, description, created_at FROM categories'
+    );
+    res.json(categories);
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+});
+
+app.post('/categories', authenticateToken, roleMiddleware('admin'), async (req, res) => {
+  const { name, description } = req.body;
+  
+  if (!name) {
+    return res.status(400).json({ error: 'Category name is required' });
+  }
+
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO categories (name, description) VALUES (?, ?)',
+      [name, description || null]
+    );
+    
+    res.status(201).json({ 
+      message: 'Category created!',
+      category_id: result.insertId,
+      name,
+      description
+    });
+  } catch (error) {
+    console.error('Category creation error:', error);
+    res.status(500).json({ error: 'Failed to create category' });
+  }
+});
+
+// Apps Routes
 app.get('/apps', async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      'SELECT * FROM apps WHERE status = "approved" ORDER BY created_at DESC LIMIT 100'
-    );
-    res.json(rows);
+    const { featured, category } = req.query;
+    let query = 'SELECT * FROM apps WHERE status = "approved"';
+    const params = [];
+    
+    if (featured) {
+      query += ' AND is_featured = TRUE';
+    }
+    
+    if (category) {
+      query += ' AND category_id = ?';
+      params.push(category);
+    }
+    
+    query += ' ORDER BY created_at DESC LIMIT 100';
+    
+    const [apps] = await pool.query(query, params);
+    res.json(apps);
   } catch (error) {
-    console.error('Apps fetch error:', error);
+    console.error('Error fetching apps:', error);
     res.status(500).json({ error: 'Failed to fetch apps' });
   }
 });
 
-// Add to your server.js
-app.get('/api/apps', async (req, res) => {
-    try {
-      const { featured, category } = req.query;
-      let query = 'SELECT * FROM apps WHERE status = "approved"';
-      const params = [];
-      
-      if (featured) {
-        query += ' AND is_featured = TRUE';
-      }
-      
-      if (category) {
-        query += ' AND category_id = ?';
-        params.push(category);
-      }
-      
-      query += ' ORDER BY created_at DESC LIMIT 100';
-      
-      const [apps] = await pool.query(query, params);
-      res.json(apps);
-    } catch (error) {
-      console.error('Error fetching apps:', error);
-      res.status(500).json({ error: 'Failed to fetch apps' });
-    }
-  });
-
-// Get all categories
-app.get('/api/categories', async (req, res) => {
-    try {
-      const [categories] = await pool.query('SELECT * FROM categories');
-      res.json(categories);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      res.status(500).json({ error: 'Failed to fetch categories' });
-    }
-  });
+app.put('/admin/apps/:app_id/feature', authenticateToken, roleMiddleware('admin'), async (req, res) => {
+  try {
+    const { featured } = req.body;
+    await pool.query(
+      'UPDATE apps SET is_featured = ? WHERE app_id = ?',
+      [featured, req.params.app_id]
+    );
+    res.json({ message: `App ${featured ? 'featured' : 'unfeatured'} successfully` });
+  } catch (error) {
+    console.error('Feature update error:', error);
+    res.status(500).json({ error: 'Failed to update featured status' });
+  }
+});
 
 // Developer Routes
 app.get('/validate-token', authenticateToken, (req, res) => {
@@ -255,24 +273,6 @@ app.post('/developer/apps', authenticateToken, roleMiddleware('developer'), asyn
   }
 });
 
-app.delete('/developer/apps/:app_id', authenticateToken, roleMiddleware('developer'), async (req, res) => {
-  try {
-    const [result] = await pool.query(
-      'DELETE FROM apps WHERE app_id = ? AND developer_id = ?',
-      [req.params.app_id, req.user.user_id]
-    );
-    
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'App not found' });
-    }
-    
-    res.json({ message: 'App deleted successfully' });
-  } catch (error) {
-    console.error('App deletion error:', error);
-    res.status(500).json({ error: 'Failed to delete app' });
-  }
-});
-
 // Admin Routes
 app.get('/admin/apps', authenticateToken, roleMiddleware('admin'), async (req, res) => {
   try {
@@ -286,67 +286,16 @@ app.get('/admin/apps', authenticateToken, roleMiddleware('admin'), async (req, r
   }
 });
 
-app.put('/admin/apps/:app_id/approve', authenticateToken, roleMiddleware('admin'), async (req, res) => {
-  try {
-    await pool.query(
-      'UPDATE apps SET status = "approved" WHERE app_id = ?',
-      [req.params.app_id]
-    );
-    res.json({ message: 'App approved successfully' });
-  } catch (error) {
-    console.error('Approval error:', error);
-    res.status(500).json({ error: 'Failed to approve app' });
-  }
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
-app.post('/admin/apps/:app_id/reject', authenticateToken, roleMiddleware('admin'), async (req, res) => {
-  const { rejection_reason } = req.body;
-  
-  if (!rejection_reason) {
-    return res.status(400).json({ error: 'Rejection reason required' });
-  }
-
-  try {
-    await pool.query('BEGIN');
-    
-    await pool.query(
-      'UPDATE apps SET status = "rejected" WHERE app_id = ?',
-      [req.params.app_id]
-    );
-    
-    await pool.query(
-      `INSERT INTO app_rejections 
-      (app_id, rejection_reason, rejected_by)
-      VALUES (?, ?, ?)`,
-      [req.params.app_id, rejection_reason, req.user.user_id]
-    );
-    
-    await pool.query('COMMIT');
-    res.json({ message: 'App rejected successfully' });
-  } catch (error) {
-    await pool.query('ROLLBACK');
-    console.error('Rejection error:', error);
-    res.status(500).json({ error: 'Failed to reject app' });
-  }
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
 });
-
-// Website Performance
-const updateWebsitePerformance = async () => {
-  try {
-    await pool.query(`
-      UPDATE website_performance
-      SET visits = (SELECT COUNT(*) FROM downloads),
-        downloads = (SELECT COUNT(*) FROM downloads),
-        reviews = (SELECT COUNT(*) FROM reviews)
-      WHERE performance_id = 1
-    `);
-    console.log('Website stats updated');
-  } catch (error) {
-    console.error('Stats update error:', error);
-  }
-};
-
-setInterval(updateWebsitePerformance, 300000);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
