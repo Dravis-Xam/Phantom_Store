@@ -12,6 +12,11 @@
         .chart-container { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
         .stat-card { transition: transform 0.2s; }
         .stat-card:hover { transform: translateY(-5px); }
+        .error-badge { font-size: 0.8rem; padding: 4px 8px; }
+        .gauge-container { width: 100%; max-width: 250px; margin: 0 auto; }
+        .error-row { cursor: pointer; }
+        .error-row:hover { background-color: #f8f9fa; }
+        #errorDetailModal .modal-body pre { max-height: 300px; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -24,6 +29,7 @@
                         <li class="nav-item"><a class="nav-link active dashboard-link" href="#dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link apps-link" href="#apps"><i class="bi bi-collection me-2"></i> Apps</a></li>
                         <li class="nav-item"><a class="nav-link users-link" href="#users"><i class="bi bi-people me-2"></i> Users</a></li>
+                        <li class="nav-item"><a class="nav-link errors-link" href="#errors-performance"><i class="bi bi-exclamation-octagon me-2"></i> Errors & Perf</a></li>
                         <li class="nav-item"><a class="nav-link settings-link" href="#settings"><i class="bi bi-gear me-2"></i> Settings</a></li>
                     </ul>
                 </div>
@@ -64,6 +70,126 @@
                     </div>
                 </section>
 
+                <!-- Error & Performance Section -->
+                <section id="errors-performance" class="d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Error Analytics & Performance</h2>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-2" id="refreshErrors">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                                <label class="form-check-label" for="autoRefresh">Auto-refresh</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3">
+                            <div class="card stat-card bg-danger text-white">
+                                <div class="card-body">
+                                    <h5><i class="bi bi-x-octagon me-2"></i> Critical Errors</h5>
+                                    <h2 id="critical-errors">0</h2>
+                                    <small class="opacity-75" id="critical-trend"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card bg-warning text-dark">
+                                <div class="card-body">
+                                    <h5><i class="bi bi-exclamation-triangle me-2"></i> Unhandled</h5>
+                                    <h2 id="unhandled-errors">0</h2>
+                                    <small class="opacity-75" id="unhandled-trend"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body">
+                                    <h5><i class="bi bi-speedometer me-2"></i> Avg Load</h5>
+                                    <h2 id="avg-load">0ms</h2>
+                                    <small class="opacity-75" id="load-trend"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body">
+                                    <h5><i class="bi bi-activity me-2"></i> Uptime</h5>
+                                    <h2 id="uptime">99.9%</h2>
+                                    <small class="opacity-75" id="uptime-trend"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Error Trends</h5>
+                                    <select class="form-select form-select-sm w-auto" id="trendPeriod">
+                                        <option value="1">Last 24h</option>
+                                        <option value="7" selected>Last 7d</option>
+                                        <option value="30">Last 30d</option>
+                                    </select>
+                                </div>
+                                <canvas id="errorTrendsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h5>Error Distribution</h5>
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <canvas id="errorDistributionChart"></canvas>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="gauge-container mt-3" id="criticalGauge"></div>
+                                        <div class="gauge-container mt-3" id="unhandledGauge"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h5>Performance Metrics</h5>
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="card-title mb-0">Recent Critical Errors</h5>
+                                        <button class="btn btn-sm btn-outline-danger" id="resolveAll">
+                                            <i class="bi bi-check-circle me-1"></i> Mark All Handled
+                                        </button>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Code</th>
+                                                    <th>Message</th>
+                                                    <th>Location</th>
+                                                    <th>Time</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="criticalErrorsTable"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Settings Section -->
                 <section id="settings" class="d-none">
                     <h2 class="mb-4">Settings</h2>
@@ -79,6 +205,53 @@
                     </div><button type="submit" class="btn btn-primary mt-4">Save</button></form>
                 </section>
             </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="errorDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorModalTitle">Error Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Error Code:</strong> <span id="errorModalCode"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Severity:</strong> <span id="errorModalSeverity"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Location:</strong> <span id="errorModalLocation"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Occurred:</strong> <span id="errorModalTime"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Full Message:</strong>
+                        <pre class="bg-light p-3 rounded" id="errorModalMessage"></pre>
+                    </div>
+                    <div class="mb-3" id="errorModalStackTraceContainer">
+                        <strong>Stack Trace:</strong>
+                        <pre class="bg-light p-3 rounded" id="errorModalStackTrace"></pre>
+                    </div>
+                    <div class="mb-3">
+                        <label for="resolutionNotes" class="form-label">Resolution Notes</label>
+                        <textarea class="form-control" id="resolutionNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="markAsResolved">
+                        <i class="bi bi-check-circle me-1"></i> Mark as Resolved
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -137,8 +310,463 @@
             }
         }
 
+        // In your admin panel JavaScript
+        let autoRefreshInterval;
+        let currentErrorId = null;
+        
+        // Initialize all charts
+        const initCharts = () => {
+            // Error Trends Chart
+            window.errorTrendsChart = new Chart(
+                document.getElementById('errorTrendsChart').getContext('2d'), 
+                {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [
+                            {
+                                label: 'Critical Errors',
+                                data: [],
+                                borderColor: '#dc3545',
+                                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'All Errors',
+                                data: [],
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Error Count'
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+
+            // Error Distribution Chart
+            window.errorDistributionChart = new Chart(
+                document.getElementById('errorDistributionChart').getContext('2d'), 
+                {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Critical', 'High', 'Medium', 'Low'],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#0dcaf0'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                }
+            );
+
+            // Performance Chart
+            window.performanceChart = new Chart(
+                document.getElementById('performanceChart').getContext('2d'), 
+                {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [
+                            {
+                                label: 'Load Time (ms)',
+                                data: [],
+                                borderColor: '#0d6efd',
+                                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Page Views (thousands)',
+                                data: [],
+                                borderColor: '#198754',
+                                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Load Time (ms)'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Page Views'
+                                },
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+        };
+
+        // Initialize gauge charts
+        const initGauges = () => {
+            // Critical Errors Gauge
+            window.criticalGauge = new Chart(
+                document.getElementById('criticalGauge'), 
+                {
+                    type: 'gauge',
+                    data: {
+                        labels: ['Critical Errors'],
+                        datasets: [{
+                            value: 0,
+                            minValue: 0,
+                            data: [5, 10], // Warning at 5, Critical at 10
+                            backgroundColor: ['green', 'orange', 'red']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true,
+                            text: 'Critical Errors Today'
+                        },
+                        needle: {
+                            radiusPercentage: 2,
+                            widthPercentage: 3.2,
+                            lengthPercentage: 80,
+                            color: 'rgba(0, 0, 0, 0.8)'
+                        }
+                    }
+                }
+            );
+
+            // Unhandled Errors Gauge
+            window.unhandledGauge = new Chart(
+                document.createElement('canvas'), 
+                {
+                    type: 'gauge',
+                    data: {
+                        labels: ['Unhandled Errors'],
+                        datasets: [{
+                            value: 0,
+                            minValue: 0,
+                            data: [3, 7], // Warning at 3, Critical at 7
+                            backgroundColor: ['green', 'orange', 'red']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true,
+                            text: 'Unhandled Errors'
+                        },
+                        needle: {
+                            radiusPercentage: 2,
+                            widthPercentage: 3.2,
+                            lengthPercentage: 80,
+                            color: 'rgba(0, 0, 0, 0.8)'
+                        }
+                    }
+                }
+            );
+            document.getElementById('criticalGauge').appendChild(window.criticalGauge.canvas);
+            document.getElementById('unhandledGauge').appendChild(window.unhandledGauge.canvas);
+        };
+
+        // Fetch data from API
+        const fetchData = async (url) => {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network error');
+                return await response.json();
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showToast('Failed to fetch data', 'danger');
+                return null;
+            }
+        };
+
+        // Load error analytics data
+        const loadErrorData = async () => {
+            const period = document.getElementById('trendPeriod').value;
+            const [errorStats, performanceData] = await Promise.all([
+                fetchData(`${API_BASE}/error-stats?period=${period}`),
+                fetchData(`${API_BASE}/performance-metrics`)
+            ]);
+            
+            if (errorStats) {
+                // Update stats cards
+                document.getElementById('critical-errors').textContent = errorStats.criticalCount;
+                document.getElementById('unhandled-errors').textContent = errorStats.unhandledCount;
+                
+                // Update trend indicators
+                updateTrendIndicator('critical', errorStats.criticalTrend);
+                updateTrendIndicator('unhandled', errorStats.unhandledTrend);
+                
+                // Update error trends chart
+                errorTrendsChart.data.labels = errorStats.trends.labels;
+                errorTrendsChart.data.datasets[0].data = errorStats.trends.critical;
+                errorTrendsChart.data.datasets[1].data = errorStats.trends.all;
+                errorTrendsChart.update();
+                
+                // Update error distribution
+                errorDistributionChart.data.datasets[0].data = [
+                    errorStats.severity.critical,
+                    errorStats.severity.high,
+                    errorStats.severity.medium,
+                    errorStats.severity.low
+                ];
+                errorDistributionChart.update();
+                
+                // Update gauges
+                criticalGauge.data.datasets[0].value = errorStats.criticalToday;
+                criticalGauge.update();
+                unhandledGauge.data.datasets[0].value = errorStats.unhandledCount;
+                unhandledGauge.update();
+                
+                // Update critical errors table
+                renderCriticalErrorsTable(errorStats.recentCritical);
+            }
+            
+            if (performanceData) {
+                // Update performance stats
+                document.getElementById('avg-load').textContent = `${performanceData.avgLoadTime}ms`;
+                document.getElementById('uptime').textContent = `${performanceData.uptime}%`;
+                
+                // Update trend indicators
+                updateTrendIndicator('load', performanceData.loadTrend);
+                updateTrendIndicator('uptime', performanceData.uptimeTrend);
+                
+                // Update performance chart
+                performanceChart.data.labels = performanceData.labels;
+                performanceChart.data.datasets[0].data = performanceData.loadTimes;
+                performanceChart.data.datasets[1].data = performanceData.pageViews;
+                performanceChart.update();
+            }
+        };
+
+        // Render critical errors table
+        const renderCriticalErrorsTable = (errors) => {
+            const tableBody = document.getElementById('criticalErrorsTable');
+            tableBody.innerHTML = errors.map(error => `
+                <tr class="error-row" data-error-id="${error.error_id}">
+                    <td>
+                        <span class="badge bg-${getSeverityColor(error.severity_level)}">
+                            ${error.error_code}
+                        </span>
+                    </td>
+                    <td>${truncate(error.error_message, 30)}</td>
+                    <td>${error.location}</td>
+                    <td>${formatTime(error.timestamp)}</td>
+                    <td>
+                        <span class="badge ${error.is_handled ? 'bg-success' : 'bg-danger'} error-badge">
+                            ${error.is_handled ? 'Handled' : 'Unhandled'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Add click handlers to each row
+            document.querySelectorAll('.error-row').forEach(row => {
+                row.addEventListener('click', () => showErrorDetails(row.dataset.errorId));
+            });
+        };
+
+        // Show error details modal
+        const showErrorDetails = async (errorId) => {
+            const error = await fetchData(`${API_BASE}/errors/${errorId}`);
+            if (!error) return;
+            
+            currentErrorId = errorId;
+            
+            // Populate modal
+            document.getElementById('errorModalTitle').textContent = error.error_name;
+            document.getElementById('errorModalCode').textContent = error.error_code;
+            document.getElementById('errorModalSeverity').innerHTML = `
+                <span class="badge bg-${getSeverityColor(error.severity_level)}">
+                    ${error.severity_level}
+                </span>
+            `;
+            document.getElementById('errorModalLocation').textContent = error.location;
+            document.getElementById('errorModalTime').textContent = formatDateTime(error.timestamp);
+            document.getElementById('errorModalMessage').textContent = error.error_message;
+            
+            // Show stack trace if available
+            const stackTraceContainer = document.getElementById('errorModalStackTraceContainer');
+            const stackTraceElement = document.getElementById('errorModalStackTrace');
+            if (error.stack_trace) {
+                stackTraceElement.textContent = error.stack_trace;
+                stackTraceContainer.style.display = 'block';
+            } else {
+                stackTraceContainer.style.display = 'none';
+            }
+            
+            // Set resolution notes
+            document.getElementById('resolutionNotes').value = error.resolution_notes || '';
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('errorDetailModal'));
+            modal.show();
+        };
+
+        // Mark error as resolved
+        document.getElementById('markAsResolved').addEventListener('click', async () => {
+            const notes = document.getElementById('resolutionNotes').value;
+            const response = await fetch(`${API_BASE}/errors/${currentErrorId}/resolve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notes })
+            });
+            
+            if (response.ok) {
+                showToast('Error marked as resolved', 'success');
+                loadErrorData();
+                bootstrap.Modal.getInstance(document.getElementById('errorDetailModal')).hide();
+            } else {
+                showToast('Failed to resolve error', 'danger');
+            }
+        });
+
+        // Mark all errors as handled
+        document.getElementById('resolveAll').addEventListener('click', async () => {
+            const response = await fetch(`${API_BASE}/errors/resolve-all`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (response.ok) {
+                showToast('All errors marked as handled', 'success');
+                loadErrorData();
+            } else {
+                showToast('Failed to resolve errors', 'danger');
+            }
+        });
+
+        // Helper functions
+        const getSeverityColor = (severity) => {
+            switch (severity) {
+                case 'critical': return 'danger';
+                case 'high': return 'warning';
+                case 'medium': return 'info';
+                case 'low': return 'secondary';
+                default: return 'light';
+            }
+        };
+
+        const truncate = (str, length) => {
+            return str.length > length ? str.substring(0, length) + '...' : str;
+        };
+
+        const formatTime = (timestamp) => {
+            return new Date(timestamp).toLocaleTimeString();
+        };
+
+        const formatDateTime = (timestamp) => {
+            return new Date(timestamp).toLocaleString();
+        };
+
+        const updateTrendIndicator = (type, trend) => {
+            const element = document.getElementById(`${type}-trend`);
+            if (!element) return;
+            
+            if (trend > 0) {
+                element.innerHTML = `<i class="bi bi-arrow-up text-danger"></i> ${Math.abs(trend)}% increase`;
+                element.classList.add('text-danger');
+                element.classList.remove('text-success');
+            } else if (trend < 0) {
+                element.innerHTML = `<i class="bi bi-arrow-down text-success"></i> ${Math.abs(trend)}% decrease`;
+                element.classList.add('text-success');
+                element.classList.remove('text-danger');
+            } else {
+                element.innerHTML = `<i class="bi bi-dash text-muted"></i> No change`;
+                element.classList.remove('text-danger', 'text-success');
+            }
+        };
+
+        const showToast = (message, type) => {
+            // Implement toast notification
+            console.log(`${type.toUpperCase()}: ${message}`);
+        };
+
+        // Initialize auto-refresh
+        const initAutoRefresh = () => {
+            if (document.getElementById('autoRefresh').checked) {
+                autoRefreshInterval = setInterval(loadErrorData, 30000); // 30 seconds
+            } else {
+                clearInterval(autoRefreshInterval);
+            }
+        };
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            initGauges();
+            loadErrorData();
+            initAutoRefresh();
+            
+            // Refresh button
+            document.getElementById('refreshErrors').addEventListener('click', loadErrorData);
+            
+            // Auto-refresh toggle
+            document.getElementById('autoRefresh').addEventListener('change', initAutoRefresh);
+            
+            // Period selector
+            document.getElementById('trendPeriod').addEventListener('change', loadErrorData);
+            
+            // Navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('section').forEach(s => s.classList.add('d-none'));
+                    document.querySelector(link.getAttribute('href')).classList.remove('d-none');
+                });
+            });
+        });
+
         async function loadDashboard() {
             const stats = await fetchData(`${API_BASE}/stats`);
+            await loadErrorData();
             const apps = await fetchData(`${API_BASE}/admin/apps?user_id=${currentAdmin.user_id}`);
             const users = await fetchData(`${API_BASE}/admin/users?user_id=${currentAdmin.user_id}`);
 
