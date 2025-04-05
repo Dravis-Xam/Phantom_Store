@@ -123,6 +123,29 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+const roleMiddleware = (role) => async (req, res, next) => {
+  if (!req.user) return res.status(403).json({ error: 'Authentication required' });
+  
+  try {
+    const [rows] = await pool.query(
+      'SELECT type FROM users WHERE user_id = ?',
+      [req.user.user_id]
+    );
+    
+    if (!rows.length || rows[0].type !== role) {
+      return res.status(403).json({ error: `${role} privileges required` });
+    }
+    
+    req.user.type = role;
+    next();
+  } catch (error) {
+    console.error('Middleware error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+
 app.post('/register', async (req, res) => {
   try {
     const { username, email, password, type } = req.body;
