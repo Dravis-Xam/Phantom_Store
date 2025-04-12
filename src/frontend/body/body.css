@@ -2,10 +2,153 @@
     position: relative;
     top: 120px;
     padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
-button {
-    background-color: transparent;
+
+  .global-error-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .error-container {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+  }
+  
+  .error-container.fade-in {
+    animation: fadeIn 0.3s;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .error-toast {
+    min-width: 300px;
+    background: #ffebee;
+    border-left: 4px solid #f44336;
+    padding: 15px;
+    position: relative;
+  }
+  
+  .closeBtn {
+    background: none;
     border: none;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+  }
+  
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #09f;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+/* Category specific styles */
+.category-container {
+  margin-bottom: 30px;
+}
+
+.category-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.category-inner {
+  display: flex;
+  gap: 25px;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
+  transition: height 0.3s ease;
+}
+
+.category-inner.collapsed {
+  height: 0;
+  overflow: hidden;
+}
+
+.showNextAppsBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.no-apps-message, .no-categories-message {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    transition: all 0.3s ease;
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.3s;
+  }
+  
+  .fade-out {
+    animation: fadeOut 0.3s;
+  }
+  
+  .error-toast {
+    min-width: 250px;
+    background: #ffebee;
+    border-left: 4px solid #f44336;
+  }
+  
+  .closeBtn {
+    background: none;
+    border: none;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .closeBtn:hover {
+    color: #000;
+  }
+
+button {
     cursor: pointer;
     transition: all .5s cubic-bezier(0.215, 0.610, 0.355, 1);
 }
@@ -83,11 +226,11 @@ button {
 }
 
 .showPrevSlidebtn {
-    left: -250px;
+    left: -0px;
 }
 
 .showNextSlidebtn {
-    right: -250px;
+    right: -0px;
 }
 
 /* Fade effect at the ends */
@@ -220,6 +363,7 @@ button {
 .category-container {
     position: relative;
     margin-bottom: 20px;
+    padding-left: 30px;
 }
 
 .category-inner {

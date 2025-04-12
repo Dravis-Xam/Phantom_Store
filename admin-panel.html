@@ -7,76 +7,944 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .sidebar { height: 100vh; background: #f8f9fa; border-right: 1px solid #dee2e6; }
-        .chart-container { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
-        .stat-card { transition: transform 0.2s; }
-        .stat-card:hover { transform: translateY(-5px); }
-        .error-badge { font-size: 0.8rem; padding: 4px 8px; }
-        .gauge-container { width: 100%; max-width: 250px; margin: 0 auto; }
-        .error-row { cursor: pointer; }
-        .error-row:hover { background-color: #f8f9fa; }
-        #errorDetailModal .modal-body pre { max-height: 300px; overflow-y: auto; }
+        :root {
+            --primary-color: #0f3460;
+            --secondary-color: #1a1a2e;
+            --accent-color: #e94560;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8b8b;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            background: var(--primary-color);
+            height: 100vh;
+            position: fixed;
+            width: 260px;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .sidebar:hover {
+            width: 280px;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            padding: 1rem 1.5rem;
+            margin: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: var(--accent-color);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(233, 69, 96, 0.2);
+        }
+
+        .nav-link i {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+
+        .stat-card:hover::before {
+            animation: shine 1.5s;
+        }
+
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+
+        .chart-container {
+            background: var(--primary-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            color: var(--text-primary);
+            background: var(--primary-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background: var(--accent-color);
+        }
+
+        .table-hover tbody tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .form-control, .form-select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(233, 69, 96, 0.25);
+        }
+
+        .modal-content {
+            background: var(--primary-color);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-accent:hover {
+            background-color: #d63a56;
+            color: white;
+        }
+
+        .badge-success {
+            background-color: var(--success-color);
+        }
+
+        .badge-warning {
+            background-color: var(--warning-color);
+            color: #212529;
+        }
+
+        .badge-danger {
+            background-color: var(--danger-color);
+        }
+
+        .badge-info {
+            background-color: var(--info-color);
+        }
+
+        .gauge-container {
+            width: 100%;
+            max-width: 250px;
+            margin: 0 auto;
+        }
+
+        .error-row {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .error-row:hover {
+            background-color: rgba(255,255,255,0.05) !important;
+        }
+
+        #errorDetailModal .modal-body pre {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            position: relative;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            .sidebar:hover {
+                width: 90px;
+            }
+            .nav-link span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 80px;
+                padding: 1rem;
+            }
+            .section-title::after {
+                width: 40px;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(233, 69, 96, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(233, 69, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(233, 69, 96, 0); }
+        }
     </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
             <nav class="col-md-2 sidebar">
-                <div class="p-3">
-                    <h3 class="text-primary">Phantom Admin</h3>
-                    <ul class="nav flex-column">
-                        <li class="nav-item"><a class="nav-link active dashboard-link" href="#dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link apps-link" href="#apps"><i class="bi bi-collection me-2"></i> Apps</a></li>
-                        <li class="nav-item"><a class="nav-link users-link" href="#users"><i class="bi bi-people me-2"></i> Users</a></li>
-                        <li class="nav-item"><a class="nav-link errors-link" href="#errors-performance"><i class="bi bi-exclamation-octagon me-2"></i> Errors & Perf</a></li>
-                        <li class="nav-item"><a class="nav-link settings-link" href="#settings"><i class="bi bi-gear me-2"></i> Settings</a></li>
-                    </ul>
+                <div class="sidebar-brand">
+                    <h3 class="text-white">👻 Phantom</h3>
                 </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active dashboard-link" href="#dashboard">
+                            <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link apps-link" href="#apps">
+                            <i class="bi bi-box-seam"></i><span>Applications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link users-link" href="#users">
+                            <i class="bi bi-people"></i><span>Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link analytics-link" href="#analytics">
+                            <i class="bi bi-graph-up"></i><span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link settings-link" href="#settings">
+                            <i class="bi bi-gear"></i><span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
             </nav>
 
-            <main class="col-md-10 ms-sm-auto p-4">
+            <main class="col-md-10 main-content">
                 <!-- Dashboard Section -->
-                <section id="dashboard">
-                    <h2 class="mb-4">Dashboard</h2>
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-3"><div class="card stat-card bg-primary text-white"><div class="card-body"><h5><i class="bi bi-download me-2"></i> Downloads</h5><h2 id="total-downloads">0</h2></div></div></div>
-                        <div class="col-md-3"><div class="card stat-card bg-success text-white"><div class="card-body"><h5><i class="bi bi-eye me-2"></i> Visits</h5><h2 id="total-visits">0</h2></div></div></div>
-                        <div class="col-md-3"><div class="card stat-card bg-warning text-dark"><div class="card-body"><h5><i class="bi bi-puzzle me-2"></i> Pending</h5><h2 id="pending-apps">0</h2></div></div></div>
-                        <div class="col-md-3"><div class="card stat-card bg-info text-white"><div class="card-body"><h5><i class="bi bi-people me-2"></i> Users</h5><h2 id="total-users">0</h2></div></div></div>
+                <section id="dashboard" class="fade-in">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title fw-bold">Dashboard Overview</h2>
+                        <div class="d-flex gap-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="darkMode" checked>
+                                <label class="form-check-label" for="darkMode">Dark Mode</label>
+                            </div>
+                            <button class="btn btn-sm btn-accent">
+                                <i class="bi bi-cloud-arrow-down me-1"></i> Export Report
+                            </button>
+                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6"><div class="chart-container"><h5>Traffic</h5><canvas id="trafficChart"></canvas></div></div>
-                        <div class="col-md-6"><div class="chart-container"><h5>Developer Activity</h5><canvas id="uploadsChart"></canvas></div></div>
+
+                    <!-- Stats Grid -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-accent p-3 rounded-circle me-3">
+                                        <i class="bi bi-download fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Downloads</p>
+                                        <h2 class="mb-0" id="total-downloads">24.5k</h2>
+                                        <small class="text-success"><i class="bi bi-arrow-up"></i> 12% from last week</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success p-3 rounded-circle me-3">
+                                        <i class="bi bi-eye fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Visits</p>
+                                        <h2 class="mb-0" id="total-visits">48.2k</h2>
+                                        <small class="text-success"><i class="bi bi-arrow-up"></i> 8% from last week</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning p-3 rounded-circle me-3">
+                                        <i class="bi bi-puzzle fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Pending Apps</p>
+                                        <h2 class="mb-0" id="pending-apps">14</h2>
+                                        <small class="text-danger"><i class="bi bi-arrow-down"></i> 3 from yesterday</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info p-3 rounded-circle me-3">
+                                        <i class="bi bi-people fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Active Users</p>
+                                        <h2 class="mb-0" id="total-users">8.7k</h2>
+                                        <small class="text-success"><i class="bi bi-arrow-up"></i> 5% from last week</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="row g-4">
+                        <div class="col-12 col-lg-8">
+                            <div class="chart-container">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">Performance Metrics</h5>
+                                    <select class="form-select form-select-sm w-auto">
+                                        <option>Last 7 Days</option>
+                                        <option selected>Last 30 Days</option>
+                                        <option>Last 90 Days</option>
+                                    </select>
+                                </div>
+                                <canvas id="mainChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="chart-container">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">User Distribution</h5>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                                <canvas id="doughnutChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="chart-container">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">Recent Activity</h5>
+                                    <button class="btn btn-sm btn-accent">View All</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Event</th>
+                                                <th>User</th>
+                                                <th>Location</th>
+                                                <th>Time</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>App Download</td>
+                                                <td>user@example.com</td>
+                                                <td>United States</td>
+                                                <td>2 mins ago</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Account Creation</td>
+                                                <td>newuser@example.com</td>
+                                                <td>Germany</td>
+                                                <td>15 mins ago</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>App Submission</td>
+                                                <td>dev@company.com</td>
+                                                <td>Japan</td>
+                                                <td>1 hour ago</td>
+                                                <td><span class="badge bg-warning">Pending</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Payment Processed</td>
+                                                <td>client@business.com</td>
+                                                <td>United Kingdom</td>
+                                                <td>3 hours ago</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>API Request</td>
+                                                <td>system@internal</td>
+                                                <td>Server</td>
+                                                <td>5 hours ago</td>
+                                                <td><span class="badge bg-danger">Failed</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 <!-- Apps Section -->
-                <section id="apps" class="d-none">
-                    <div class="d-flex justify-content-between mb-4">
-                        <h2>App Management</h2>
-                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="autoApprove"><label class="form-check-label" for="autoApprove">Auto-Approve</label></div>
+                <section id="apps" class="d-none fade-in">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title fw-bold">Application Management</h2>
+                        <div>
+                            <div class="form-check form-switch d-inline-block me-3">
+                                <input class="form-check-input" type="checkbox" id="autoApprove" checked>
+                                <label class="form-check-label" for="autoApprove">Auto-Approve</label>
+                            </div>
+                            <button class="btn btn-sm btn-accent">
+                                <i class="bi bi-plus-circle me-1"></i> Add New
+                            </button>
+                        </div>
                     </div>
-                    <div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>App Name</th><th>Developer</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="appsTable"></tbody></table></div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success p-3 rounded-circle me-3">
+                                        <i class="bi bi-check-circle fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Approved</p>
+                                        <h2 class="mb-0">142</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning p-3 rounded-circle me-3">
+                                        <i class="bi bi-hourglass-split fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Pending</p>
+                                        <h2 class="mb-0">14</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-danger p-3 rounded-circle me-3">
+                                        <i class="bi bi-x-circle fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Rejected</p>
+                                        <h2 class="mb-0">8</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info p-3 rounded-circle me-3">
+                                        <i class="bi bi-arrow-repeat fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Updates</p>
+                                        <h2 class="mb-0">23</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">App Submissions</h5>
+                            <select class="form-select form-select-sm w-auto">
+                                <option>Last 7 Days</option>
+                                <option selected>Last 30 Days</option>
+                                <option>Last 90 Days</option>
+                            </select>
+                        </div>
+                        <canvas id="appsChart"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">Pending Applications</h5>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>App Name</th>
+                                        <th>Developer</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="appsTable">
+                                    <tr>
+                                        <td>Weather Pro</td>
+                                        <td>Dev Team Inc</td>
+                                        <td>2023-05-15</td>
+                                        <td><span class="badge bg-warning">Pending</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success me-1">Approve</button>
+                                            <button class="btn btn-sm btn-danger">Reject</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Task Manager</td>
+                                        <td>Productivity Apps</td>
+                                        <td>2023-05-14</td>
+                                        <td><span class="badge bg-warning">Pending</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success me-1">Approve</button>
+                                            <button class="btn btn-sm btn-danger">Reject</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fitness Tracker</td>
+                                        <td>Health Solutions</td>
+                                        <td>2023-05-13</td>
+                                        <td><span class="badge bg-warning">Pending</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success me-1">Approve</button>
+                                            <button class="btn btn-sm btn-danger">Reject</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Photo Editor</td>
+                                        <td>Creative Studio</td>
+                                        <td>2023-05-12</td>
+                                        <td><span class="badge bg-warning">Pending</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success me-1">Approve</button>
+                                            <button class="btn btn-sm btn-danger">Reject</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Users Section -->
-                <section id="users" class="d-none">
-                    <h2 class="mb-4">User Management</h2>
-                    <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#clients">Clients</a></li><li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#developers">Developers</a></li></ul>
+                <section id="users" class="d-none fade-in">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title fw-bold">User Management</h2>
+                        <button class="btn btn-sm btn-accent">
+                            <i class="bi bi-plus-circle me-1"></i> Add User
+                        </button>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-accent p-3 rounded-circle me-3">
+                                        <i class="bi bi-people fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Total Users</p>
+                                        <h2 class="mb-0">8,742</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success p-3 rounded-circle me-3">
+                                        <i class="bi bi-person-check fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Active</p>
+                                        <h2 class="mb-0">6,521</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning p-3 rounded-circle me-3">
+                                        <i class="bi bi-person-dash fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Inactive</p>
+                                        <h2 class="mb-0">1,203</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info p-3 rounded-circle me-3">
+                                        <i class="bi bi-building fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Developers</p>
+                                        <h2 class="mb-0">1,018</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="nav nav-tabs" id="usersTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="clients-tab" data-bs-toggle="tab" data-bs-target="#clients" type="button" role="tab">Clients</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="developers-tab" data-bs-toggle="tab" data-bs-target="#developers" type="button" role="tab">Developers</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="admins-tab" data-bs-toggle="tab" data-bs-target="#admins" type="button" role="tab">Admins</button>
+                        </li>
+                    </ul>
+
                     <div class="tab-content mt-3">
-                        <div class="tab-pane fade show active" id="clients"><div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>Name</th><th>Email</th><th>Downloads</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div>
-                        <div class="tab-pane fade" id="developers"><div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>Company</th><th>Apps</th><th>Approved</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="developersTable"></tbody></table></div></div>
+                        <div class="tab-pane fade show active" id="clients" role="tabpanel">
+                            <div class="chart-container">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">Client Users</h5>
+                                    <div class="input-group w-auto">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Search...">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Downloads</th>
+                                                <th>Last Active</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="clientsTable">
+                                            <tr>
+                                                <td>John Doe</td>
+                                                <td>john@example.com</td>
+                                                <td>24</td>
+                                                <td>2 hours ago</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Ban</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Jane Smith</td>
+                                                <td>jane@example.com</td>
+                                                <td>12</td>
+                                                <td>1 day ago</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Ban</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Robert Johnson</td>
+                                                <td>robert@example.com</td>
+                                                <td>5</td>
+                                                <td>3 days ago</td>
+                                                <td><span class="badge bg-warning">Inactive</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Ban</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Emily Davis</td>
+                                                <td>emily@example.com</td>
+                                                <td>18</td>
+                                                <td>1 week ago</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Ban</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center mt-3">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="developers" role="tabpanel">
+                            <div class="chart-container">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">Developer Accounts</h5>
+                                    <div class="input-group w-auto">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Search...">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Company</th>
+                                                <th>Contact</th>
+                                                <th>Apps</th>
+                                                <th>Approved</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="developersTable">
+                                            <tr>
+                                                <td>Dev Team Inc</td>
+                                                <td>contact@devteam.com</td>
+                                                <td>12</td>
+                                                <td>8</td>
+                                                <td><span class="badge bg-success">Verified</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Revoke</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>App Creators</td>
+                                                <td>info@appcreators.com</td>
+                                                <td>7</td>
+                                                <td>5</td>
+                                                <td><span class="badge bg-success">Verified</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Revoke</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>New Devs</td>
+                                                <td>hello@newdevs.com</td>
+                                                <td>3</td>
+                                                <td>0</td>
+                                                <td><span class="badge bg-warning">Pending</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Revoke</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tech Solutions</td>
+                                                <td>support@techsolutions.com</td>
+                                                <td>15</td>
+                                                <td>12</td>
+                                                <td><span class="badge bg-success">Verified</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Revoke</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center mt-3">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="admins" role="tabpanel">
+                            <div class="chart-container">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">Administrators</h5>
+                                    <button class="btn btn-sm btn-accent">
+                                        <i class="bi bi-plus-circle me-1"></i> Add Admin
+                                    </button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                                <th>Last Login</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="adminsTable">
+                                            <tr>
+                                                <td>Admin User</td>
+                                                <td>admin@example.com</td>
+                                                <td>Super Admin</td>
+                                                <td>15 mins ago</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Disable</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Support Admin</td>
+                                                <td>support@example.com</td>
+                                                <td>Support</td>
+                                                <td>1 hour ago</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Disable</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Content Moderator</td>
+                                                <td>moderator@example.com</td>
+                                                <td>Moderator</td>
+                                                <td>3 hours ago</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Disable</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
-                <!-- Error & Performance Section -->
-                <section id="errors-performance" class="d-none">
+                <!-- Analytics Section -->
+                <section id="analytics" class="d-none fade-in">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Error Analytics & Performance</h2>
+                        <h2 class="section-title fw-bold">Error Analytics & Performance</h2>
                         <div>
-                            <button class="btn btn-sm btn-outline-primary me-2" id="refreshErrors">
-                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            <button class="btn btn-sm btn-accent me-2" id="refreshErrors">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
                             </button>
                             <div class="form-check form-switch d-inline-block">
                                 <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
@@ -86,46 +954,66 @@
                     </div>
 
                     <div class="row g-4 mb-4">
-                        <div class="col-md-3">
-                            <div class="card stat-card bg-danger text-white">
-                                <div class="card-body">
-                                    <h5><i class="bi bi-x-octagon me-2"></i> Critical Errors</h5>
-                                    <h2 id="critical-errors">0</h2>
-                                    <small class="opacity-75" id="critical-trend"></small>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-danger p-3 rounded-circle me-3">
+                                        <i class="bi bi-x-octagon fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Critical Errors</p>
+                                        <h2 class="mb-0" id="critical-errors">24</h2>
+                                        <small class="text-danger"><i class="bi bi-arrow-up"></i> 8% increase</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card bg-warning text-dark">
-                                <div class="card-body">
-                                    <h5><i class="bi bi-exclamation-triangle me-2"></i> Unhandled</h5>
-                                    <h2 id="unhandled-errors">0</h2>
-                                    <small class="opacity-75" id="unhandled-trend"></small>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning p-3 rounded-circle me-3">
+                                        <i class="bi bi-exclamation-triangle fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Unhandled</p>
+                                        <h2 class="mb-0" id="unhandled-errors">12</h2>
+                                        <small class="text-success"><i class="bi bi-arrow-down"></i> 5% decrease</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card bg-success text-white">
-                                <div class="card-body">
-                                    <h5><i class="bi bi-speedometer me-2"></i> Avg Load</h5>
-                                    <h2 id="avg-load">0ms</h2>
-                                    <small class="opacity-75" id="load-trend"></small>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success p-3 rounded-circle me-3">
+                                        <i class="bi bi-speedometer fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Avg Load</p>
+                                        <h2 class="mb-0" id="avg-load">342ms</h2>
+                                        <small class="text-success"><i class="bi bi-arrow-down"></i> 12% improvement</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card bg-info text-white">
-                                <div class="card-body">
-                                    <h5><i class="bi bi-activity me-2"></i> Uptime</h5>
-                                    <h2 id="uptime">99.9%</h2>
-                                    <small class="opacity-75" id="uptime-trend"></small>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info p-3 rounded-circle me-3">
+                                        <i class="bi bi-activity fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-secondary">Uptime</p>
+                                        <h2 class="mb-0" id="uptime">99.9%</h2>
+                                        <small class="text-success"><i class="bi bi-check-circle"></i> Stable</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="row mb-4">
-                        <div class="col-md-6">
+                        <div class="col-12 col-lg-6">
                             <div class="chart-container">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">Error Trends</h5>
@@ -138,14 +1026,14 @@
                                 <canvas id="errorTrendsChart"></canvas>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-lg-6">
                             <div class="chart-container">
-                                <h5>Error Distribution</h5>
+                                <h5 class="mb-3">Error Distribution</h5>
                                 <div class="row">
-                                    <div class="col-md-7">
+                                    <div class="col-12 col-md-7">
                                         <canvas id="errorDistributionChart"></canvas>
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-12 col-md-5">
                                         <div class="gauge-container mt-3" id="criticalGauge"></div>
                                         <div class="gauge-container mt-3" id="unhandledGauge"></div>
                                     </div>
@@ -155,35 +1043,69 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-12 col-lg-6">
                             <div class="chart-container">
-                                <h5>Performance Metrics</h5>
+                                <h5 class="mb-3">Performance Metrics</h5>
                                 <canvas id="performanceChart"></canvas>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="card-title mb-0">Recent Critical Errors</h5>
-                                        <button class="btn btn-sm btn-outline-danger" id="resolveAll">
-                                            <i class="bi bi-check-circle me-1"></i> Mark All Handled
-                                        </button>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Code</th>
-                                                    <th>Message</th>
-                                                    <th>Location</th>
-                                                    <th>Time</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="criticalErrorsTable"></tbody>
-                                        </table>
-                                    </div>
+                        <div class="col-12 col-lg-6">
+                            <div class="chart-container">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Recent Critical Errors</h5>
+                                    <button class="btn btn-sm btn-danger" id="resolveAll">
+                                        <i class="bi bi-check-circle me-1"></i> Mark All Handled
+                                    </button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Message</th>
+                                                <th>Location</th>
+                                                <th>Time</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="criticalErrorsTable">
+                                            <tr class="error-row">
+                                                <td><span class="badge bg-danger">500</span></td>
+                                                <td>Database connection failed</td>
+                                                <td>/api/users</td>
+                                                <td>5 mins ago</td>
+                                                <td><span class="badge bg-danger">Unhandled</span></td>
+                                            </tr>
+                                            <tr class="error-row">
+                                                <td><span class="badge bg-danger">404</span></td>
+                                                <td>Resource not found</td>
+                                                <td>/dashboard</td>
+                                                <td>12 mins ago</td>
+                                                <td><span class="badge bg-success">Handled</span></td>
+                                            </tr>
+                                            <tr class="error-row">
+                                                <td><span class="badge bg-danger">403</span></td>
+                                                <td>Access forbidden</td>
+                                                <td>/admin/settings</td>
+                                                <td>25 mins ago</td>
+                                                <td><span class="badge bg-danger">Unhandled</span></td>
+                                            </tr>
+                                            <tr class="error-row">
+                                                <td><span class="badge bg-danger">500</span></td>
+                                                <td>Internal server error</td>
+                                                <td>/api/analytics</td>
+                                                <td>1 hour ago</td>
+                                                <td><span class="badge bg-warning">Investigating</span></td>
+                                            </tr>
+                                            <tr class="error-row">
+                                                <td><span class="badge bg-danger">400</span></td>
+                                                <td>Invalid request</td>
+                                                <td>/api/submit</td>
+                                                <td>2 hours ago</td>
+                                                <td><span class="badge bg-success">Handled</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -191,23 +1113,101 @@
                 </section>
 
                 <!-- Settings Section -->
-                <section id="settings" class="d-none">
-                    <h2 class="mb-4">Settings</h2>
-                    <form id="websiteSettings"><div class="row g-4">
-                        <div class="col-md-6"><div class="card h-100"><div class="card-body"><h5>General</h5>
-                            <div class="mb-3"><label class="form-label">Site Title</label><input type="text" class="form-control" id="siteTitle"></div>
-                            <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" id="siteDescription" rows="3"></textarea></div>
-                        </div></div></div>
-                        <div class="col-md-6"><div class="card h-100"><div class="card-body"><h5>Maintenance</h5>
-                            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="maintenanceMode"><label class="form-check-label" for="maintenanceMode">Enable</label></div>
-                            <div class="mt-3" id="maintenanceMessageField" style="display: none;"><label class="form-label">Message</label><textarea class="form-control" id="maintenanceMessage" rows="3"></textarea></div>
-                        </div></div></div>
-                    </div><button type="submit" class="btn btn-primary mt-4">Save</button></form>
+                <section id="settings" class="d-none fade-in">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title fw-bold">System Settings</h2>
+                        <button class="btn btn-sm btn-accent" id="saveSettings">
+                            <i class="bi bi-save me-1"></i> Save Changes
+                        </button>
+                    </div>
+
+                    <form id="websiteSettings">
+                        <div class="row g-4">
+                            <div class="col-12 col-lg-6">
+                                <div class="chart-container">
+                                    <h5 class="mb-4">General Settings</h5>
+                                    <div class="mb-3">
+                                        <label for="siteTitle" class="form-label">Site Title</label>
+                                        <input type="text" class="form-control" id="siteTitle" value="Phantom Store">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="siteDescription" class="form-label">Description</label>
+                                        <textarea class="form-control" id="siteDescription" rows="3">The best app store for modern applications</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="adminEmail" class="form-label">Admin Email</label>
+                                        <input type="email" class="form-control" id="adminEmail" value="admin@phantom.store">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="timezone" class="form-label">Timezone</label>
+                                        <select class="form-select" id="timezone">
+                                            <option selected>UTC</option>
+                                            <option>EST</option>
+                                            <option>PST</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <div class="chart-container">
+                                    <h5 class="mb-4">Maintenance Mode</h5>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="maintenanceMode">
+                                        <label class="form-check-label" for="maintenanceMode">Enable Maintenance Mode</label>
+                                    </div>
+                                    <div class="mb-3" id="maintenanceMessageField" style="display: none;">
+                                        <label for="maintenanceMessage" class="form-label">Message</label>
+                                        <textarea class="form-control" id="maintenanceMessage" rows="3">We're currently performing maintenance. Please check back soon.</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="logoUpload" class="form-label">Logo</label>
+                                        <input class="form-control" type="file" id="logoUpload">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="faviconUpload" class="form-label">Favicon</label>
+                                        <input class="form-control" type="file" id="faviconUpload">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="chart-container">
+                                    <h5 class="mb-4">Security Settings</h5>
+                                    <div class="row g-3">
+                                        <div class="col-12 col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="enable2FA" checked>
+                                                <label class="form-check-label" for="enable2FA">Require 2FA for Admins</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="passwordComplexity" checked>
+                                                <label class="form-check-label" for="passwordComplexity">Enforce Password Complexity</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="loginAlerts" checked>
+                                                <label class="form-check-label" for="loginAlerts">Email Login Alerts</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="ipWhitelist">
+                                                <label class="form-check-label" for="ipWhitelist">Enable IP Whitelist</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </section>
             </main>
         </div>
     </div>
 
+    <!-- Error Detail Modal -->
     <div class="modal fade" id="errorDetailModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -218,31 +1218,31 @@
                 <div class="modal-body">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <strong>Error Code:</strong> <span id="errorModalCode"></span>
+                            <strong>Error Code:</strong> <span id="errorModalCode">500</span>
                         </div>
                         <div class="col-md-6">
-                            <strong>Severity:</strong> <span id="errorModalSeverity"></span>
+                            <strong>Severity:</strong> <span id="errorModalSeverity" class="badge bg-danger">Critical</span>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <strong>Location:</strong> <span id="errorModalLocation"></span>
+                            <strong>Location:</strong> <span id="errorModalLocation">/api/users</span>
                         </div>
                         <div class="col-md-6">
-                            <strong>Occurred:</strong> <span id="errorModalTime"></span>
+                            <strong>Occurred:</strong> <span id="errorModalTime">2023-05-15 14:32:45</span>
                         </div>
                     </div>
                     <div class="mb-3">
                         <strong>Full Message:</strong>
-                        <pre class="bg-light p-3 rounded" id="errorModalMessage"></pre>
+                        <pre class="bg-light p-3 rounded" id="errorModalMessage">Database connection failed: Connection refused (code: ECONNREFUSED)</pre>
                     </div>
-                    <div class="mb-3" id="errorModalStackTraceContainer">
+                    <div class="mb-3">
                         <strong>Stack Trace:</strong>
-                        <pre class="bg-light p-3 rounded" id="errorModalStackTrace"></pre>
+                        <pre class="bg-light p-3 rounded" id="errorModalStackTrace">Error: Connection refused\n    at Object.&lt;anonymous&gt; (/app/server.js:45:23)\n    at Module._compile (internal/modules/cjs/loader.js:999:30)\n    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1027:10)</pre>
                     </div>
                     <div class="mb-3">
                         <label for="resolutionNotes" class="form-label">Resolution Notes</label>
-                        <textarea class="form-control" id="resolutionNotes" rows="3"></textarea>
+                        <textarea class="form-control" id="resolutionNotes" rows="3">Restarted database service and verified connection.</textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -255,606 +1255,457 @@
         </div>
     </div>
 
-    <!-- Modals -->
-    <div class="modal fade" id="confirmationModal"><div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Confirm</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">Are you sure?</div>
-        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-danger" id="confirmAction">Confirm</button></div>
-    </div></div></div>
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to perform this action? This cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmAction">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <small>Just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Settings saved successfully.
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let currentAdmin = null;
-        const API_BASE = 'http://localhost:3000';
-        
-        // Charts
-        const trafficChart = new Chart(document.getElementById('trafficChart').getContext('2d'), {
+        // Initialize charts with dark theme
+        Chart.defaults.color = '#fff';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+        // Main Chart
+        const mainChart = new Chart(document.getElementById('mainChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                 datasets: [{
-                    label: 'Downloads',
-                    data: [],
-                    borderColor: '#0d6efd',
-                    tension: 0.4
+                    label: 'Active Users',
+                    data: [65, 59, 80, 81, 56, 55],
+                    borderColor: '#e94560',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(233, 69, 96, 0.1)'
                 }, {
-                    label: 'Visits',
-                    data: [],
-                    borderColor: '#198754',
-                    tension: 0.4
+                    label: 'Downloads',
+                    data: [28, 48, 40, 19, 86, 27],
+                    borderColor: '#0d6efd',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)'
                 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
             }
         });
 
-        const uploadsChart = new Chart(document.getElementById('uploadsChart').getContext('2d'), {
+        // Doughnut Chart
+        const doughnutChart = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Mobile', 'Desktop', 'Tablet'],
+                datasets: [{
+                    data: [300, 150, 50],
+                    backgroundColor: ['#e94560', '#0d6efd', '#ffc107'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // Apps Chart
+        const appsChart = new Chart(document.getElementById('appsChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: [],
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
                 datasets: [{
-                    label: 'Apps',
-                    data: [],
-                    backgroundColor: '#ffc107'
+                    label: 'Submitted',
+                    data: [12, 19, 3, 5, 2],
+                    backgroundColor: '#e94560'
+                }, {
+                    label: 'Approved',
+                    data: [8, 15, 2, 3, 1],
+                    backgroundColor: '#28a745'
                 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        beginAtZero: true
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
             }
         });
 
-        // Data Fetching
-        async function fetchData(url) {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Network error');
-                return await response.json();
-            } catch (error) {
-                console.error('Fetch error:', error);
-                return null;
+        // Error Trends Chart
+        const errorTrendsChart = new Chart(document.getElementById('errorTrendsChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Critical Errors',
+                    data: [12, 19, 3, 5, 2, 3, 8],
+                    borderColor: '#e94560',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(233, 69, 96, 0.1)'
+                }, {
+                    label: 'All Errors',
+                    data: [24, 32, 18, 25, 12, 15, 22],
+                    borderColor: '#ffc107',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        beginAtZero: true
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
             }
-        }
+        });
 
-        // In your admin panel JavaScript
-        let autoRefreshInterval;
-        let currentErrorId = null;
-        
-        // Initialize all charts
-        const initCharts = () => {
-            // Error Trends Chart
-            window.errorTrendsChart = new Chart(
-                document.getElementById('errorTrendsChart').getContext('2d'), 
-                {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [
-                            {
-                                label: 'Critical Errors',
-                                data: [],
-                                borderColor: '#dc3545',
-                                backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                                tension: 0.4,
-                                fill: true
-                            },
-                            {
-                                label: 'All Errors',
-                                data: [],
-                                borderColor: '#ffc107',
-                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                                tension: 0.4,
-                                fill: true
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false
-                            }
+        // Error Distribution Chart
+        const errorDistributionChart = new Chart(document.getElementById('errorDistributionChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Critical', 'High', 'Medium', 'Low'],
+                datasets: [{
+                    data: [12, 19, 15, 8],
+                    backgroundColor: ['#e94560', '#fd7e14', '#ffc107', '#0dcaf0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // Performance Chart
+        const performanceChart = new Chart(document.getElementById('performanceChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                datasets: [{
+                    label: 'Load Time (ms)',
+                    data: [320, 350, 280, 410, 380, 360, 340],
+                    borderColor: '#0d6efd',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    yAxisID: 'y'
+                }, {
+                    label: 'Requests (thousands)',
+                    data: [4.2, 5.1, 7.8, 8.5, 6.3, 5.9, 4.7],
+                    borderColor: '#28a745',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Load Time (ms)'
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Error Count'
-                                }
-                            }
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
                         }
-                    }
-                }
-            );
-
-            // Error Distribution Chart
-            window.errorDistributionChart = new Chart(
-                document.getElementById('errorDistributionChart').getContext('2d'), 
-                {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Critical', 'High', 'Medium', 'Low'],
-                        datasets: [{
-                            data: [0, 0, 0, 0],
-                            backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#0dcaf0'],
-                            borderWidth: 1
-                        }]
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                }
-            );
-
-            // Performance Chart
-            window.performanceChart = new Chart(
-                document.getElementById('performanceChart').getContext('2d'), 
-                {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [
-                            {
-                                label: 'Load Time (ms)',
-                                data: [],
-                                borderColor: '#0d6efd',
-                                backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                                tension: 0.4,
-                                fill: true,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'Page Views (thousands)',
-                                data: [],
-                                borderColor: '#198754',
-                                backgroundColor: 'rgba(25, 135, 84, 0.1)',
-                                tension: 0.4,
-                                fill: true,
-                                yAxisID: 'y1'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Requests'
                         },
-                        scales: {
-                            y: {
-                                type: 'linear',
-                                display: true,
-                                position: 'left',
-                                title: {
-                                    display: true,
-                                    text: 'Load Time (ms)'
-                                }
-                            },
-                            y1: {
-                                type: 'linear',
-                                display: true,
-                                position: 'right',
-                                title: {
-                                    display: true,
-                                    text: 'Page Views'
-                                },
-                                grid: {
-                                    drawOnChartArea: false
-                                }
-                            }
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
                         }
                     }
                 }
-            );
-        };
+            }
+        });
 
         // Initialize gauge charts
-        const initGauges = () => {
+        function initGauges() {
             // Critical Errors Gauge
-            window.criticalGauge = new Chart(
-                document.getElementById('criticalGauge'), 
-                {
-                    type: 'gauge',
-                    data: {
-                        labels: ['Critical Errors'],
-                        datasets: [{
-                            value: 0,
-                            minValue: 0,
-                            data: [5, 10], // Warning at 5, Critical at 10
-                            backgroundColor: ['green', 'orange', 'red']
-                        }]
+            const criticalGauge = new Chart(document.getElementById('criticalGauge'), {
+                type: 'gauge',
+                data: {
+                    labels: ['Critical'],
+                    datasets: [{
+                        value: 12,
+                        minValue: 0,
+                        data: [5, 10], // Warning at 5, Critical at 10
+                        backgroundColor: ['#28a745', '#ffc107', '#e94560']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Critical Errors Today',
+                        fontColor: '#fff'
                     },
-                    options: {
-                        responsive: true,
-                        title: {
-                            display: true,
-                            text: 'Critical Errors Today'
-                        },
-                        needle: {
-                            radiusPercentage: 2,
-                            widthPercentage: 3.2,
-                            lengthPercentage: 80,
-                            color: 'rgba(0, 0, 0, 0.8)'
-                        }
+                    needle: {
+                        radiusPercentage: 2,
+                        widthPercentage: 3.2,
+                        lengthPercentage: 80,
+                        color: 'rgba(255, 255, 255, 0.8)'
+                    },
+                    valueLabel: {
+                        fontColor: '#fff'
                     }
                 }
-            );
+            });
 
             // Unhandled Errors Gauge
-            window.unhandledGauge = new Chart(
-                document.createElement('canvas'), 
-                {
-                    type: 'gauge',
-                    data: {
-                        labels: ['Unhandled Errors'],
-                        datasets: [{
-                            value: 0,
-                            minValue: 0,
-                            data: [3, 7], // Warning at 3, Critical at 7
-                            backgroundColor: ['green', 'orange', 'red']
-                        }]
+            const unhandledGauge = new Chart(document.getElementById('unhandledGauge'), {
+                type: 'gauge',
+                data: {
+                    labels: ['Unhandled'],
+                    datasets: [{
+                        value: 8,
+                        minValue: 0,
+                        data: [3, 7], // Warning at 3, Critical at 7
+                        backgroundColor: ['#28a745', '#ffc107', '#e94560']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Unhandled Errors',
+                        fontColor: '#fff'
                     },
-                    options: {
-                        responsive: true,
-                        title: {
-                            display: true,
-                            text: 'Unhandled Errors'
-                        },
-                        needle: {
-                            radiusPercentage: 2,
-                            widthPercentage: 3.2,
-                            lengthPercentage: 80,
-                            color: 'rgba(0, 0, 0, 0.8)'
-                        }
+                    needle: {
+                        radiusPercentage: 2,
+                        widthPercentage: 3.2,
+                        lengthPercentage: 80,
+                        color: 'rgba(255, 255, 255, 0.8)'
+                    },
+                    valueLabel: {
+                        fontColor: '#fff'
                     }
                 }
-            );
-            document.getElementById('criticalGauge').appendChild(window.criticalGauge.canvas);
-            document.getElementById('unhandledGauge').appendChild(window.unhandledGauge.canvas);
-        };
-
-        // Fetch data from API
-        const fetchData = async (url) => {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Network error');
-                return await response.json();
-            } catch (error) {
-                console.error('Fetch error:', error);
-                showToast('Failed to fetch data', 'danger');
-                return null;
-            }
-        };
-
-        // Load error analytics data
-        const loadErrorData = async () => {
-            const period = document.getElementById('trendPeriod').value;
-            const [errorStats, performanceData] = await Promise.all([
-                fetchData(`${API_BASE}/error-stats?period=${period}`),
-                fetchData(`${API_BASE}/performance-metrics`)
-            ]);
-            
-            if (errorStats) {
-                // Update stats cards
-                document.getElementById('critical-errors').textContent = errorStats.criticalCount;
-                document.getElementById('unhandled-errors').textContent = errorStats.unhandledCount;
-                
-                // Update trend indicators
-                updateTrendIndicator('critical', errorStats.criticalTrend);
-                updateTrendIndicator('unhandled', errorStats.unhandledTrend);
-                
-                // Update error trends chart
-                errorTrendsChart.data.labels = errorStats.trends.labels;
-                errorTrendsChart.data.datasets[0].data = errorStats.trends.critical;
-                errorTrendsChart.data.datasets[1].data = errorStats.trends.all;
-                errorTrendsChart.update();
-                
-                // Update error distribution
-                errorDistributionChart.data.datasets[0].data = [
-                    errorStats.severity.critical,
-                    errorStats.severity.high,
-                    errorStats.severity.medium,
-                    errorStats.severity.low
-                ];
-                errorDistributionChart.update();
-                
-                // Update gauges
-                criticalGauge.data.datasets[0].value = errorStats.criticalToday;
-                criticalGauge.update();
-                unhandledGauge.data.datasets[0].value = errorStats.unhandledCount;
-                unhandledGauge.update();
-                
-                // Update critical errors table
-                renderCriticalErrorsTable(errorStats.recentCritical);
-            }
-            
-            if (performanceData) {
-                // Update performance stats
-                document.getElementById('avg-load').textContent = `${performanceData.avgLoadTime}ms`;
-                document.getElementById('uptime').textContent = `${performanceData.uptime}%`;
-                
-                // Update trend indicators
-                updateTrendIndicator('load', performanceData.loadTrend);
-                updateTrendIndicator('uptime', performanceData.uptimeTrend);
-                
-                // Update performance chart
-                performanceChart.data.labels = performanceData.labels;
-                performanceChart.data.datasets[0].data = performanceData.loadTimes;
-                performanceChart.data.datasets[1].data = performanceData.pageViews;
-                performanceChart.update();
-            }
-        };
-
-        // Render critical errors table
-        const renderCriticalErrorsTable = (errors) => {
-            const tableBody = document.getElementById('criticalErrorsTable');
-            tableBody.innerHTML = errors.map(error => `
-                <tr class="error-row" data-error-id="${error.error_id}">
-                    <td>
-                        <span class="badge bg-${getSeverityColor(error.severity_level)}">
-                            ${error.error_code}
-                        </span>
-                    </td>
-                    <td>${truncate(error.error_message, 30)}</td>
-                    <td>${error.location}</td>
-                    <td>${formatTime(error.timestamp)}</td>
-                    <td>
-                        <span class="badge ${error.is_handled ? 'bg-success' : 'bg-danger'} error-badge">
-                            ${error.is_handled ? 'Handled' : 'Unhandled'}
-                        </span>
-                    </td>
-                </tr>
-            `).join('');
-            
-            // Add click handlers to each row
-            document.querySelectorAll('.error-row').forEach(row => {
-                row.addEventListener('click', () => showErrorDetails(row.dataset.errorId));
             });
-        };
-
-        // Show error details modal
-        const showErrorDetails = async (errorId) => {
-            const error = await fetchData(`${API_BASE}/errors/${errorId}`);
-            if (!error) return;
-            
-            currentErrorId = errorId;
-            
-            // Populate modal
-            document.getElementById('errorModalTitle').textContent = error.error_name;
-            document.getElementById('errorModalCode').textContent = error.error_code;
-            document.getElementById('errorModalSeverity').innerHTML = `
-                <span class="badge bg-${getSeverityColor(error.severity_level)}">
-                    ${error.severity_level}
-                </span>
-            `;
-            document.getElementById('errorModalLocation').textContent = error.location;
-            document.getElementById('errorModalTime').textContent = formatDateTime(error.timestamp);
-            document.getElementById('errorModalMessage').textContent = error.error_message;
-            
-            // Show stack trace if available
-            const stackTraceContainer = document.getElementById('errorModalStackTraceContainer');
-            const stackTraceElement = document.getElementById('errorModalStackTrace');
-            if (error.stack_trace) {
-                stackTraceElement.textContent = error.stack_trace;
-                stackTraceContainer.style.display = 'block';
-            } else {
-                stackTraceContainer.style.display = 'none';
-            }
-            
-            // Set resolution notes
-            document.getElementById('resolutionNotes').value = error.resolution_notes || '';
-            
-            // Show modal
-            const modal = new bootstrap.Modal(document.getElementById('errorDetailModal'));
-            modal.show();
-        };
-
-        // Mark error as resolved
-        document.getElementById('markAsResolved').addEventListener('click', async () => {
-            const notes = document.getElementById('resolutionNotes').value;
-            const response = await fetch(`${API_BASE}/errors/${currentErrorId}/resolve`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ notes })
-            });
-            
-            if (response.ok) {
-                showToast('Error marked as resolved', 'success');
-                loadErrorData();
-                bootstrap.Modal.getInstance(document.getElementById('errorDetailModal')).hide();
-            } else {
-                showToast('Failed to resolve error', 'danger');
-            }
-        });
-
-        // Mark all errors as handled
-        document.getElementById('resolveAll').addEventListener('click', async () => {
-            const response = await fetch(`${API_BASE}/errors/resolve-all`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            
-            if (response.ok) {
-                showToast('All errors marked as handled', 'success');
-                loadErrorData();
-            } else {
-                showToast('Failed to resolve errors', 'danger');
-            }
-        });
-
-        // Helper functions
-        const getSeverityColor = (severity) => {
-            switch (severity) {
-                case 'critical': return 'danger';
-                case 'high': return 'warning';
-                case 'medium': return 'info';
-                case 'low': return 'secondary';
-                default: return 'light';
-            }
-        };
-
-        const truncate = (str, length) => {
-            return str.length > length ? str.substring(0, length) + '...' : str;
-        };
-
-        const formatTime = (timestamp) => {
-            return new Date(timestamp).toLocaleTimeString();
-        };
-
-        const formatDateTime = (timestamp) => {
-            return new Date(timestamp).toLocaleString();
-        };
-
-        const updateTrendIndicator = (type, trend) => {
-            const element = document.getElementById(`${type}-trend`);
-            if (!element) return;
-            
-            if (trend > 0) {
-                element.innerHTML = `<i class="bi bi-arrow-up text-danger"></i> ${Math.abs(trend)}% increase`;
-                element.classList.add('text-danger');
-                element.classList.remove('text-success');
-            } else if (trend < 0) {
-                element.innerHTML = `<i class="bi bi-arrow-down text-success"></i> ${Math.abs(trend)}% decrease`;
-                element.classList.add('text-success');
-                element.classList.remove('text-danger');
-            } else {
-                element.innerHTML = `<i class="bi bi-dash text-muted"></i> No change`;
-                element.classList.remove('text-danger', 'text-success');
-            }
-        };
-
-        const showToast = (message, type) => {
-            // Implement toast notification
-            console.log(`${type.toUpperCase()}: ${message}`);
-        };
-
-        // Initialize auto-refresh
-        const initAutoRefresh = () => {
-            if (document.getElementById('autoRefresh').checked) {
-                autoRefreshInterval = setInterval(loadErrorData, 30000); // 30 seconds
-            } else {
-                clearInterval(autoRefreshInterval);
-            }
-        };
-
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            initCharts();
-            initGauges();
-            loadErrorData();
-            initAutoRefresh();
-            
-            // Refresh button
-            document.getElementById('refreshErrors').addEventListener('click', loadErrorData);
-            
-            // Auto-refresh toggle
-            document.getElementById('autoRefresh').addEventListener('change', initAutoRefresh);
-            
-            // Period selector
-            document.getElementById('trendPeriod').addEventListener('change', loadErrorData);
-            
-            // Navigation
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    document.querySelectorAll('section').forEach(s => s.classList.add('d-none'));
-                    document.querySelector(link.getAttribute('href')).classList.remove('d-none');
-                });
-            });
-        });
-
-        async function loadDashboard() {
-            const stats = await fetchData(`${API_BASE}/stats`);
-            await loadErrorData();
-            const apps = await fetchData(`${API_BASE}/admin/apps?user_id=${currentAdmin.user_id}`);
-            const users = await fetchData(`${API_BASE}/admin/users?user_id=${currentAdmin.user_id}`);
-
-            // Update stats
-            if(stats) {
-                document.getElementById('total-downloads').textContent = stats.downloads;
-                document.getElementById('total-visits').textContent = stats.visits;
-                document.getElementById('total-users').textContent = users?.length || 0;
-                document.getElementById('pending-apps').textContent = apps?.filter(a => a.status === 'pending').length || 0;
-            }
-
-            // Update apps table
-            if(apps) {
-                document.getElementById('appsTable').innerHTML = apps.map(app => `
-                    <tr>
-                        <td>${app.name}</td>
-                        <td>${app.developer_id}</td>
-                        <td>${new Date(app.created_at).toLocaleDateString()}</td>
-                        <td><span class="badge ${app.status === 'approved' ? 'bg-success' : 'bg-warning'}">${app.status}</span></td>
-                        <td>
-                            ${app.status === 'pending' ? `
-                                <button class="btn btn-sm btn-success approve-btn" data-id="${app.app_id}">Approve</button>
-                                <button class="btn btn-sm btn-danger reject-btn" data-id="${app.app_id}">Reject</button>
-                            ` : ''}
-                        </td>
-                    </tr>
-                `).join('');
-            }
-
-            // Update users
-            if(users) {
-                const clients = users.filter(u => u.type === 'client');
-                const developers = users.filter(u => u.type === 'developer');
-                
-                document.getElementById('clientsTable').innerHTML = clients.map(user => `
-                    <tr>
-                        <td>${user.full_name}</td>
-                        <td>${user.email}</td>
-                        <td>${user.downloads || 0}</td>
-                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
-                        <td><button class="btn btn-sm btn-danger delete-user" data-id="${user.user_id}">Delete</button></td>
-                    </tr>
-                `).join('');
-
-                document.getElementById('developersTable').innerHTML = developers.map(user => `
-                    <tr>
-                        <td>${user.company_name}</td>
-                        <td>${user.app_count || 0}</td>
-                        <td>${user.approved_apps || 0}</td>
-                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
-                        <td><button class="btn btn-sm btn-danger delete-user" data-id="${user.user_id}">Delete</button></td>
-                    </tr>
-                `).join('');
-            }
         }
 
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Simulate login (replace with actual login flow)
-            currentAdmin = { user_id: 1, type: 'admin' };
-            
-            await loadDashboard();
-            setInterval(loadDashboard, 300000);
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize gauges
+            initGauges();
 
+            // Navigation
             document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    document.querySelectorAll('section').forEach(s => s.classList.add('d-none'));
-                    document.querySelector(link.getAttribute('href')).classList.remove('d-none');
+                    
+                    // Hide all sections
+                    document.querySelectorAll('section').forEach(section => {
+                        section.classList.add('d-none');
+                    });
+                    
+                    // Show the selected section
+                    const target = this.getAttribute('href');
+                    document.querySelector(target).classList.remove('d-none');
+                    
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    this.classList.add('active');
                 });
             });
 
-            document.getElementById('appsTable').addEventListener('click', async (e) => {
-                if(e.target.classList.contains('approve-btn')) {
-                    const appId = e.target.dataset.id;
-                    await fetch(`${API_BASE}/apps/${appId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: 'approved', user_id: currentAdmin.user_id })
+            // Maintenance mode toggle
+            document.getElementById('maintenanceMode').addEventListener('change', function() {
+                document.getElementById('maintenanceMessageField').style.display = 
+                    this.checked ? 'block' : 'none';
+            });
+
+            // Error row click handler
+            document.querySelectorAll('.error-row').forEach(row => {
+                row.addEventListener('click', function() {
+                    const modal = new bootstrap.Modal(document.getElementById('errorDetailModal'));
+                    modal.show();
+                });
+            });
+
+            // Mark as resolved button
+            document.getElementById('markAsResolved').addEventListener('click', function() {
+                const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                document.querySelector('.toast-body').textContent = 'Error marked as resolved';
+                toast.show();
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('errorDetailModal'));
+                modal.hide();
+            });
+
+            // Save settings button
+            document.getElementById('saveSettings').addEventListener('click', function() {
+                const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                document.querySelector('.toast-body').textContent = 'Settings saved successfully';
+                toast.show();
+            });
+
+            // Resolve all errors button
+            document.getElementById('resolveAll').addEventListener('click', function() {
+                const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                confirmationModal.show();
+                
+                document.getElementById('confirmAction').addEventListener('click', function() {
+                    const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                    document.querySelector('.toast-body').textContent = 'All errors marked as resolved';
+                    toast.show();
+                    
+                    confirmationModal.hide();
+                    
+                    // Update the UI
+                    document.querySelectorAll('#criticalErrorsTable .badge.bg-danger').forEach(badge => {
+                        badge.classList.remove('bg-danger');
+                        badge.classList.add('bg-success');
+                        badge.textContent = 'Handled';
                     });
-                    await loadDashboard();
+                });
+            });
+
+            // Auto-refresh toggle
+            let refreshInterval;
+            document.getElementById('autoRefresh').addEventListener('change', function() {
+                if (this.checked) {
+                    refreshInterval = setInterval(() => {
+                        console.log('Refreshing data...');
+                        // In a real app, you would fetch new data here
+                    }, 30000);
+                } else {
+                    clearInterval(refreshInterval);
                 }
             });
-        });
 
-        document.getElementById('maintenanceMode').addEventListener('change', function() {
-            document.getElementById('maintenanceMessageField').style.display = 
-                this.checked ? 'block' : 'none';
+            // Trend period selector
+            document.getElementById('trendPeriod').addEventListener('change', function() {
+                console.log('Trend period changed to:', this.value);
+                // In a real app, you would update the chart data here
+            });
+
+            // Refresh errors button
+            document.getElementById('refreshErrors').addEventListener('click', function() {
+                console.log('Refreshing error data...');
+                // In a real app, you would fetch new error data here
+            });
+
+            // Dark mode toggle
+            document.getElementById('darkMode').addEventListener('change', function() {
+                document.body.classList.toggle('light-mode');
+                // Note: In a real app, you would need to implement the light mode styles
+                console.log('Dark mode toggled');
+            });
         });
     </script>
 </body>

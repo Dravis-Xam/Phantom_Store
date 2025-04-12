@@ -41,6 +41,20 @@ body, button {
     text-align: center;
 }
 
+.nav-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    height: 70px;
+}
+
+.nav-button:hover {
+    border-bottom: .4px solid blue;
+}
+.nav-button:hover > * {
+    color: blue;
+}
+
 .link-container {
     padding: 5px;
     transition: all .3s cubic-bezier(0.215, 0.610, 0.355, 1);
@@ -298,6 +312,8 @@ body, button {
     cursor: pointer;
     transition: all .3s cubic-bezier(0.215, 0.610, 0.355, 1);
 }
+
+
 
 .more-stats div:hover {
     border: .1px solid #dbdbdb;
