@@ -40,20 +40,6 @@ export default function CheckApp() {
           </button>
           <button className="install-button other-devices">Install on more devices</button>
         </div>
-
-        <div className="secondary-actions">
-          <button className="share-button">Share</button>
-          <a href="#" className="waitlist-link">Add to waitlist</a>
-        </div>
-
-        <div className="legal-notice">
-          <small>
-            By downloading the beta and the game, you agree to the{' '}
-            <a href="#" target="_blank" rel="noopener noreferrer">Google Terms of Service®</a> and{' '}
-            <a href="#" target="_blank" rel="noopener noreferrer">Google Play Terms of Service®</a>.{' '}
-            <a href="#" target="_blank" rel="noopener noreferrer">Learn more!?</a>
-          </small>
-        </div>
       </div>
     </div>
   )

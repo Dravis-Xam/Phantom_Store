@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Dark theme (default) */
             --primary-color: #0f3460;
             --secondary-color: #1a1a2e;
             --accent-color: #e94560;
@@ -19,6 +20,29 @@
             --warning-color: #ffc107;
             --danger-color: #dc3545;
             --info-color: #17a2b8;
+            --chart-grid: rgba(255, 255, 255, 0.05);
+        }
+
+        [data-theme="light"] {
+            /* Light theme */
+            --primary-color: #f8f9fa;
+            --secondary-color: #ffffff;
+            --accent-color: #0f3460;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --chart-grid: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Add transitions */
+        body,
+        .stat-card,
+        .chart-container,
+        .table,
+        .modal-content,
+        .form-control,
+        .form-select,
+        .nav-link {
+            transition: all 0.3s ease;
         }
 
         body {
@@ -26,6 +50,7 @@
             color: var(--text-primary);
             font-family: 'Poppins', sans-serif;
             overflow-x: hidden;
+            width: 97%;
         }
 
         .sidebar {
@@ -275,6 +300,22 @@
             70% { box-shadow: 0 0 0 10px rgba(233, 69, 96, 0); }
             100% { box-shadow: 0 0 0 0 rgba(233, 69, 96, 0); }
         }
+
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .stat-card {
+            transition: background 0.3s ease;
+        }
+
+        .chart-container {
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .table {
+            transition: background 0.3s ease, color 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -282,7 +323,7 @@
         <div class="row">
             <nav class="col-md-2 sidebar">
                 <div class="sidebar-brand">
-                    <h3 class="text-white">👻 Phantom</h3>
+                    <h3>👻 Phantom</h3>
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -1290,6 +1331,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+
+        let charts = [];
         // Initialize charts with dark theme
         Chart.defaults.color = '#fff';
         Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
@@ -1336,6 +1379,7 @@
                 }
             }
         });
+        charts.push(mainChart);
 
         // Doughnut Chart
         const doughnutChart = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
@@ -1358,6 +1402,7 @@
                 cutout: '70%'
             }
         });
+        charts.push(doughnutChart);
 
         // Apps Chart
         const appsChart = new Chart(document.getElementById('appsChart').getContext('2d'), {
@@ -1396,6 +1441,7 @@
                 }
             }
         });
+        charts.push(appsChart);
 
         // Error Trends Chart
         const errorTrendsChart = new Chart(document.getElementById('errorTrendsChart').getContext('2d'), {
@@ -1440,6 +1486,7 @@
                 }
             }
         });
+        charts.push(errorTrendsChart);
 
         // Error Distribution Chart
         const errorDistributionChart = new Chart(document.getElementById('errorDistributionChart').getContext('2d'), {
@@ -1462,6 +1509,7 @@
                 cutout: '70%'
             }
         });
+        charts.push(errorDistributionChart);
 
         // Performance Chart
         const performanceChart = new Chart(document.getElementById('performanceChart').getContext('2d'), {
@@ -1530,6 +1578,7 @@
                 }
             }
         });
+        charts.push(performanceChart);
 
         // Initialize gauge charts
         function initGauges() {
@@ -1598,7 +1647,7 @@
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize gauges
+            
             initGauges();
 
             // Navigation
@@ -1622,6 +1671,41 @@
                     this.classList.add('active');
                 });
             });
+
+            
+            const themeToggle = document.getElementById('darkMode');
+            const body = document.body;
+
+            // Initialize theme
+            function initTheme() {
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                body.setAttribute('data-theme', savedTheme);
+                themeToggle.checked = savedTheme === 'dark';
+                updateCharts();
+            }
+
+            // Update all charts
+            function updateCharts() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+                
+                charts.forEach(chart => {
+                    chart.options.scales.x.grid.color = gridColor;
+                    chart.options.scales.y.grid.color = gridColor;
+                    chart.update();
+                });
+            }
+
+            // Theme toggle handler
+            themeToggle.addEventListener('change', function() {
+                const theme = this.checked ? 'dark' : 'light';
+                body.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                updateCharts();
+            });
+
+            initTheme();
+            
 
             // Maintenance mode toggle
             document.getElementById('maintenanceMode').addEventListener('change', function() {
@@ -1698,13 +1782,6 @@
             document.getElementById('refreshErrors').addEventListener('click', function() {
                 console.log('Refreshing error data...');
                 // In a real app, you would fetch new error data here
-            });
-
-            // Dark mode toggle
-            document.getElementById('darkMode').addEventListener('change', function() {
-                document.body.classList.toggle('light-mode');
-                // Note: In a real app, you would need to implement the light mode styles
-                console.log('Dark mode toggled');
             });
         });
     </script>

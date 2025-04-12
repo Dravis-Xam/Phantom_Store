@@ -8,8 +8,11 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     font-family: noto sans, arial;
     margin: 200px auto;
-    top: 0;
+    top: -100px;
     z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    height: 300px;
   }
   
   .app-title {
@@ -133,21 +136,7 @@
     color: #4285f4;
     text-decoration: none;
   }
-  
-  .legal-notice {
-    color: #666;
-    font-size: 0.8rem;
-    line-height: 1.4;
-  }
-  
-  .legal-notice a {
-    color: #4285f4;
-    text-decoration: none;
-  }
-  
-  .legal-notice a:hover {
-    text-decoration: underline;
-  }
+ 
   
   /* Hover effects */
   .install-button:hover {
@@ -169,7 +158,7 @@
   }
 
   .app-background-image {
-    width: 50%;
+    width: 40%;
     height: 100%;
     object-fit: cover;
     z-index: 1;
@@ -181,6 +170,8 @@
 
   .back-btn {
     position: absolute;
+    background-color: transparent;
+    border: none;
     top: 0px;
     color: red;
     font-size: 20px;
